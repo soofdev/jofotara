@@ -19,6 +19,23 @@ $invoice->basicInformation()
     ->setUuid('123e4567-e89b-12d3-a456-426614174000')
     ->setIssueDate('16-02-2025')
     ->cash();  // or ->receivable()
+ 
+// Set seller information
+$invoice->sellerInformation()
+    ->setName('Your Company')
+    ->setTin('123456789');
+    
+// Set buyer information
+$invoice->buyerInformation()
+    ->setId('987654321', 'TIN')
+    ->setName('Customer Name')
+    ->setPostalCode('11937')
+    ->setCityCode('JO-IR')
+    ->setPhone('0791234567')
+    ->setTin('987654321');
+    
+// Set Supplier Income Source
+$invoice->supplierIncomeSource('123456789');
 
 // Add items with automatic tax calculation
 $invoice->items()
@@ -82,6 +99,55 @@ $invoice->buyerInformation()
     ->setPhone('0791234567')           // Optional
     ->setTin('987654321');             // Optional
 ```
+
+### Supplier Income Source
+
+The supplier income source sequence (تسلسل مصدر الدخل) is a required value that must be set for each invoice. This value is obtained from your JoFotara portal and represents your business's income source sequence number.
+
+```php
+// Set the supplier income source sequence
+$invoice->supplierIncomeSource('123456789');
+```
+
+> **Important**: The supplier income source sequence is mandatory and must be set before generating the invoice XML. You can find this value in your JoFotara portal under the income sources section (مصادر الدخل).
+
+Example usage in a complete invoice:
+
+```php
+$invoice = new JoFotaraService('your-client-id', 'your-client-secret');
+
+// Set basic information
+$invoice->basicInformation()
+    ->setInvoiceId('INV-001')
+    ->setIssueDate('2024-03-20')
+    ->cash();
+
+// Set seller information
+$invoice->sellerInformation()
+    ->setName('Your Company')
+    ->setTin('123456789');
+
+// Set buyer information
+$invoice->buyerInformation()
+    ->setId('987654321', 'TIN')
+    ->setName('Customer Name');
+
+// Set supplier income source (required)
+$invoice->supplierIncomeSource('123456789');
+
+// Add items...
+$invoice->items()
+    ->addItem('1')
+    ->setQuantity(1)
+    ->setUnitPrice(100.0)
+    ->setDescription('Product')
+    ->tax(16);
+```
+
+The supplier income source sequence is used by the JoFotara system to:
+- Track your business's income sources
+- Validate invoice submissions
+- Ensure proper tax reporting
 
 ### Invoice Items and Tax Handling
 

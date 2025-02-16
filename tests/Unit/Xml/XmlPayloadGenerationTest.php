@@ -75,7 +75,7 @@ test('generates valid XML for cash invoice with tax exempt item', function () {
         ->setPostalCode('11937')
         ->setCityCode('JO-IR');
 
-    // 4. Seller Supplier Party
+    // 4. Seller Income Source Sequence
     $invoice->supplierIncomeSource('123456789');
 
     // 5. Invoice Items
