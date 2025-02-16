@@ -1,55 +1,199 @@
-# PHP SDK to integrate with the Jordanian E-Invoice Portal (Jofotara)
+# PHP SDK for Jordan E-Invoice Portal (JoFotara)
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/jafar-albadarneh/jofotara.svg?style=flat-square)](https://packagist.org/packages/jafar-albadarneh/jofotara)
 [![Tests](https://img.shields.io/github/actions/workflow/status/jafar-albadarneh/jofotara/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/jafar-albadarneh/jofotara/actions/workflows/run-tests.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/jafar-albadarneh/jofotara.svg?style=flat-square)](https://packagist.org/packages/jafar-albadarneh/jofotara)
 
-This is where your description should go. Try and limit it to a paragraph or two. Consider adding a small example.
+A developer-friendly PHP SDK for seamless integration with Jordan's e-invoicing system (JoFotara). This package handles XML generation, validation, and API communication with a fluent, intuitive interface.
 
-## Support us
+## Quick Start
 
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/jofotara.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/jofotara)
+```php
+use JBadarneh\JoFotara\JoFotaraService;
 
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
+$invoice = new JoFotaraService('your-client-id', 'your-client-secret');
 
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+// Set basic invoice information
+$invoice->basicInformation()
+    ->setInvoiceId('INV-001')
+    ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+    ->setIssueDate('16-02-2025')
+    ->cash();  // or ->receivable()
+
+// Add items with automatic tax calculation
+$invoice->items()
+    ->addItem('1')
+    ->setQuantity(2)
+    ->setUnitPrice(100.0)
+    ->setDescription('Premium Widget')
+    ->tax(16);  // 16% VAT
+
+// Send to JoFotara
+$response = $invoice->send();
+```
 
 ## Installation
 
-You can install the package via composer:
+Install the package via composer:
 
 ```bash
 composer require jafar-albadarneh/jofotara
 ```
 
-## Usage
+## Detailed Configuration
+
+### Basic Invoice Information
 
 ```php
-$skeleton = new JBadarneh\JoFotara();
-echo $skeleton->echoPhrase('Hello, JBadarneh!');
+$invoice->basicInformation()
+    ->setInvoiceId('INV-001')           // Required: Your unique invoice ID
+    ->setUuid('123e4567-...')           // Required: UUID v4 format
+    ->setIssueDate('16-02-2025')        // Required: Format dd-mm-yyyy
+    ->cash()                            // Payment method: cash (012)
+    // or
+    ->receivable()                      // Payment method: receivable (022)
+    ->setNote('Optional note')          // Optional: Invoice note
+    ->setInvoiceCounter(1);             // Optional: Sequential counter (ICV)
+```
+
+### Seller Information
+
+```php
+// Configure default seller info (recommended)
+SellerInformation::configureDefaults(
+    tin: '123456789',
+    name: 'Your Company'
+);
+
+// Or set per invoice
+$invoice->sellerInformation()
+    ->setName('Your Company')           // Required: Company name
+    ->setTin('123456789');             // Required: Tax ID Number
+```
+
+### Buyer Information
+
+```php
+$invoice->buyerInformation()
+    ->setId('987654321', 'TIN')        // Required: ID and type (TIN, NIN, or PN)
+    ->setName('Customer Name')          // Required for receivables
+    ->setPostalCode('11937')           // Optional
+    ->setCityCode('JO-IR')             // Optional: Jordan city code
+    ->setPhone('0791234567')           // Optional
+    ->setTin('987654321');             // Optional
+```
+
+### Invoice Items and Tax Handling
+
+```php
+// Standard VAT item (16%)
+$invoice->items()
+    ->addItem('1')
+    ->setQuantity(2)
+    ->setUnitPrice(100.0)
+    ->setDescription('Premium Widget')
+    ->tax(16);
+
+// Tax exempt item
+$invoice->items()
+    ->addItem('2')
+    ->setQuantity(1)
+    ->setUnitPrice(50.0)
+    ->setDescription('Basic Widget')
+    ->taxExempted();
+
+// Zero-rated item (e.g., exports)
+$invoice->items()
+    ->addItem('3')
+    ->setQuantity(1)
+    ->setUnitPrice(75.0)
+    ->setDescription('Export Widget')
+    ->zeroTax();
+
+// Item with discount
+$invoice->items()
+    ->addItem('4')
+    ->setQuantity(1)
+    ->setUnitPrice(200.0)
+    ->setDescription('Discounted Widget')
+    ->setDiscount(20.0)  // 20 JOD discount
+    ->tax(16);
+```
+
+### Automatic Total Calculations
+
+The SDK automatically calculates all invoice totals based on the items you add:
+
+- Tax exclusive amount (before tax)
+- Tax inclusive amount (after tax)
+- Total discounts
+- Total tax amount
+- Final payable amount
+
+For special cases, you can manually set totals:
+
+```php
+$invoice->invoiceTotals()
+    ->setTaxExclusiveAmount(100.0)
+    ->setTaxInclusiveAmount(116.0)
+    ->setDiscountTotalAmount(20.0)
+    ->setTaxTotalAmount(16.0)
+    ->setPayableAmount(96.0);
+```
+
+> **Note**: When manually setting totals, they must match the calculated values from the items, or an exception will be thrown to ensure data integrity.
+
+## Validation
+
+The SDK includes comprehensive validation to ensure your invoice meets JoFotara requirements:
+
+- All required fields are present and properly formatted
+- Date formats follow dd-mm-yyyy pattern
+- Tax calculations are accurate and consistent
+- Totals match line items
+- Valid city codes and tax categories
+
+Validation errors throw `InvalidArgumentException` with descriptive messages to help you quickly identify and fix issues.
+
+## API Communication
+
+The `send()` method handles the complete flow:
+
+1. XML generation and validation
+2. Base64 encoding
+3. API authentication
+4. Error handling
+
+```php
+try {
+    $response = $invoice->send();
+    $qrCode = $response['qrCode'];
+} catch (InvalidArgumentException $e) {
+    // Handle validation errors
+    echo $e->getMessage();
+} catch (RuntimeException $e) {
+    // Handle API communication errors
+    echo $e->getMessage();
+}
 ```
 
 ## Testing
 
 ```bash
-composer test
+vendor/bin/pest
 ```
-
-## Changelog
-
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
 ## Contributing
 
-Please see [CONTRIBUTING](https://github.com/spatie/.github/blob/main/CONTRIBUTING.md) for details.
+Contributions are welcome! Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-## Security Vulnerabilities
+## Security
 
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
+If you discover any security-related issues, please email security@jbadarneh.com instead of using the issue tracker.
 
 ## Credits
 
-- [jafaralbadarneh](https://github.com/jafar-albadarneh)
+- [Jafar Albadarneh](https://github.com/jafar-albadarneh)
 - [All Contributors](../../contributors)
 
 ## License
