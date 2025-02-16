@@ -25,7 +25,7 @@ class InvoiceLineItem
 
     /**
      * Set the quantity
-     * 
+     *
      * @param float $quantity The quantity of items
      * @return self
      * @throws InvalidArgumentException If quantity is not positive
@@ -41,7 +41,7 @@ class InvoiceLineItem
 
     /**
      * Set the unit price before tax
-     * 
+     *
      * @param float $price The unit price
      * @return self
      * @throws InvalidArgumentException If price is negative
@@ -57,7 +57,7 @@ class InvoiceLineItem
 
     /**
      * Set the discount amount for this item
-     * 
+     *
      * @param float $amount The discount amount
      * @return self
      * @throws InvalidArgumentException If discount is negative or greater than total amount
@@ -78,7 +78,7 @@ class InvoiceLineItem
 
     /**
      * Set the item description
-     * 
+     *
      * @param string $description The item description
      * @return self
      */
@@ -90,7 +90,7 @@ class InvoiceLineItem
 
     /**
      * Set the item as tax exempted (0% tax rate)
-     * 
+     *
      * @return self
      */
     public function taxExempted(): self
@@ -100,7 +100,7 @@ class InvoiceLineItem
 
     /**
      * Set the item as zero rated (0% tax rate)
-     * 
+     *
      * @return self
      */
     public function zeroTax(): self
@@ -110,7 +110,7 @@ class InvoiceLineItem
 
     /**
      * Set the item's tax rate (standard rate category)
-     * 
+     *
      * @param float $rate The tax rate (1-16%)
      * @return self
      * @throws InvalidArgumentException If rate is invalid
@@ -121,11 +121,20 @@ class InvoiceLineItem
     }
 
     /**
+     * Get the discount amount for this item
+     * @return float
+     */
+    public function getDiscount(): float
+    {
+        return $this->discount;
+    }
+
+    /**
      * Set the tax category and percentage
      * Z = Exempt (0%)
      * O = Zero rated (0%)
      * S = Standard rate (1-16%)
-     * 
+     *
      * @param string $category The tax category (Z, O, or S)
      * @param float|null $percent The tax percentage (required for category S)
      * @return self
@@ -156,7 +165,7 @@ class InvoiceLineItem
 
     /**
      * Calculate the amount before tax (quantity * unit price - discount)
-     * 
+     *
      * @return float
      * @throws InvalidArgumentException If quantity or unit price is not set
      */
@@ -174,7 +183,7 @@ class InvoiceLineItem
 
     /**
      * Calculate the tax amount for this line item
-     * 
+     *
      * @return float
      * @throws InvalidArgumentException If quantity or unit price is not set
      */
@@ -186,7 +195,7 @@ class InvoiceLineItem
 
     /**
      * Calculate the total amount including tax
-     * 
+     *
      * @return float
      * @throws InvalidArgumentException If quantity or unit price is not set
      */
@@ -197,7 +206,7 @@ class InvoiceLineItem
 
     /**
      * Convert the line item to XML
-     * 
+     *
      * @return string
      * @throws InvalidArgumentException If required fields are missing
      */
@@ -216,15 +225,15 @@ class InvoiceLineItem
         $taxAmount = $this->getTaxAmount();
         $taxInclusiveAmount = $this->getTaxInclusiveAmount();
         $taxExclusiveAmount = $this->getTaxExclusiveAmount();
-        
+
         $xml = [];
         $xml[] = '<cac:InvoiceLine>';
         $xml[] = sprintf('    <cbc:ID>%s</cbc:ID>', $this->escapeXml($this->id));
-        $xml[] = sprintf('    <cbc:InvoicedQuantity unitCode="%s">%.2f</cbc:InvoicedQuantity>', 
-            $this->escapeXml($this->unitCode), 
+        $xml[] = sprintf('    <cbc:InvoicedQuantity unitCode="%s">%.2f</cbc:InvoicedQuantity>',
+            $this->escapeXml($this->unitCode),
             $this->quantity
         );
-        $xml[] = sprintf('    <cbc:LineExtensionAmount currencyID="JOD">%.2f</cbc:LineExtensionAmount>', 
+        $xml[] = sprintf('    <cbc:LineExtensionAmount currencyID="JOD">%.2f</cbc:LineExtensionAmount>',
             $taxExclusiveAmount
         );
 
@@ -235,7 +244,7 @@ class InvoiceLineItem
         $xml[] = '        <cac:TaxSubtotal>';
         $xml[] = sprintf('            <cbc:TaxAmount currencyID="JOD">%.2f</cbc:TaxAmount>', $taxAmount);
         $xml[] = '            <cac:TaxCategory>';
-        $xml[] = sprintf('                <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5305">%s</cbc:ID>', 
+        $xml[] = sprintf('                <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5305">%s</cbc:ID>',
             $this->escapeXml($this->taxCategory)
         );
         $xml[] = sprintf('                <cbc:Percent>%.2f</cbc:Percent>', $this->taxPercent);
@@ -267,7 +276,7 @@ class InvoiceLineItem
 
     /**
      * Get the current state as an array
-     * 
+     *
      * @return array
      */
     public function toArray(): array
@@ -283,4 +292,4 @@ class InvoiceLineItem
             'unitCode' => $this->unitCode,
         ];
     }
-} 
+}

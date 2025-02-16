@@ -2,19 +2,23 @@
 
 namespace JBadarneh\JoFotara;
 
+use InvalidArgumentException;
 use JBadarneh\JoFotara\Sections\BasicInvoiceInformation;
+use JBadarneh\JoFotara\Sections\InvoiceTotals;
 use JBadarneh\JoFotara\Sections\SellerInformation;
 use JBadarneh\JoFotara\Sections\BuyerInformation;
 use JBadarneh\JoFotara\Sections\InvoiceItems;
 use JBadarneh\JoFotara\Sections\MonetaryTotals;
+use JBadarneh\JoFotara\Sections\SellerSupplierParty;
 
 class JoFotaraClass
 {
     private BasicInvoiceInformation $basicInfo;
     private ?SellerInformation $sellerInfo = null;
     private ?BuyerInformation $buyerInfo = null;
+    private ?SellerSupplierParty $supplierParty = null;
     private ?InvoiceItems $items = null;
-    private ?MonetaryTotals $monetaryTotals = null;
+    private ?InvoiceTotals $invoiceTotals = null;
 
     public function __construct()
     {
@@ -58,6 +62,19 @@ class JoFotaraClass
     }
 
     /**
+     * Get the supplier information section builder
+     *
+     * @return SellerSupplierParty
+     */
+    public function supplierInformation(): SellerSupplierParty
+    {
+        if (!$this->supplierParty) {
+            $this->supplierParty = new SellerSupplierParty();
+        }
+        return $this->supplierParty;
+    }
+
+    /**
      * Get the invoice items section builder
      *
      * @return InvoiceItems
@@ -73,14 +90,37 @@ class JoFotaraClass
     /**
      * Get the monetary totals section builder
      *
-     * @return MonetaryTotals
+     * @return InvoiceTotals
      */
-    public function monetaryTotals(): MonetaryTotals
+    public function invoiceTotals(): InvoiceTotals
     {
-        if (!$this->monetaryTotals) {
-            $this->monetaryTotals = new MonetaryTotals();
+        if (!$this->invoiceTotals) {
+            $this->invoiceTotals = new InvoiceTotals();
+
+            // If we have items, calculate totals from them
+            if ($this->items && count($this->items->getItems()) > 0) {
+                $taxExclusiveAmount = 0.0;
+                $taxTotalAmount = 0.0;
+                $discountTotalAmount = 0.0;
+
+                foreach ($this->items->getItems() as $item) {
+                    $taxExclusiveAmount += $item->getTaxExclusiveAmount();
+                    $taxTotalAmount += $item->getTaxAmount();
+                    $discountTotalAmount += $item->getDiscount();
+                }
+
+                $taxInclusiveAmount = $taxExclusiveAmount + $taxTotalAmount;
+                $payableAmount = $taxInclusiveAmount - $discountTotalAmount;
+
+                $this->invoiceTotals
+                    ->setTaxExclusiveAmount($taxExclusiveAmount)
+                    ->setTaxInclusiveAmount($taxInclusiveAmount)
+                    ->setDiscountTotalAmount($discountTotalAmount)
+                    ->setTaxTotalAmount($taxTotalAmount)
+                    ->setPayableAmount($payableAmount);
+            }
         }
-        return $this->monetaryTotals;
+        return $this->invoiceTotals;
     }
 
     /**
@@ -88,42 +128,93 @@ class JoFotaraClass
      *
      * @return string The generated XML
      */
+    /**
+     * Validate that all sections are consistent
+     *
+     * @throws InvalidArgumentException If there are inconsistencies between sections
+     */
+    private function validateSections(): void
+    {
+        // If we have both items and totals, validate they match
+        if ($this->items && $this->invoiceTotals) {
+            $items = $this->items->getItems();
+            if (count($items) > 0) {
+                $calculatedTotals = new InvoiceTotals();
+
+                $taxExclusiveAmount = 0.0;
+                $taxTotalAmount = 0.0;
+                $discountTotalAmount = 0.0;
+
+                foreach ($items as $item) {
+                    $taxExclusiveAmount += $item->getTaxExclusiveAmount();
+                    $taxTotalAmount += $item->getTaxAmount();
+                    $discountTotalAmount += $item->getDiscount();
+                }
+
+                $taxInclusiveAmount = $taxExclusiveAmount + $taxTotalAmount;
+                $payableAmount = $taxInclusiveAmount - $discountTotalAmount;
+
+                $calculatedTotals
+                    ->setTaxExclusiveAmount($taxExclusiveAmount)
+                    ->setTaxInclusiveAmount($taxInclusiveAmount)
+                    ->setDiscountTotalAmount($discountTotalAmount)
+                    ->setTaxTotalAmount($taxTotalAmount)
+                    ->setPayableAmount($payableAmount);
+
+                $providedTotals = $this->invoiceTotals->toArray();
+                $expectedTotals = $calculatedTotals->toArray();
+
+                if ($providedTotals !== $expectedTotals) {
+                    throw new InvalidArgumentException('Invoice totals do not match the sum of line items');
+                }
+            }
+        }
+    }
+
     public function generateXml(): string
     {
+        // Validate sections before generating XML
+        $this->validateSections();
+
         $xml = [];
-        
+
         // Add XML declaration
         $xml[] = '<?xml version="1.0" encoding="UTF-8"?>';
-        
+
         // Add root element with namespaces (we'll need to add proper namespaces later)
         $xml[] = '<Invoice>';
-        
+
         // Add basic information
         $xml[] = $this->basicInfo->toXml();
-        
+
         // Add seller information if set
         if ($this->sellerInfo) {
             $xml[] = $this->sellerInfo->toXml();
         }
-        
+
         // Add buyer information if set
         if ($this->buyerInfo) {
             $xml[] = $this->buyerInfo->toXml();
         }
-        
+
+        // Add Supplier information if set
+        if ($this->supplierParty) {
+            $xml[] = $this->supplierParty->toXml();
+        }
+
         // Add items if set
         if ($this->items) {
             $xml[] = $this->items->toXml();
         }
-        
-        // Add monetary totals if set
-        if ($this->monetaryTotals) {
-            $xml[] = $this->monetaryTotals->toXml();
+
+        // Add invoice totals if set
+        if ($this->invoiceTotals) {
+            $xml[] = $this->invoiceTotals->toXml();
         }
-        
+
         // Close root element
         $xml[] = '</Invoice>';
-        
+
         return implode("\n", $xml);
     }
 

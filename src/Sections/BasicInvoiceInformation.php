@@ -85,6 +85,26 @@ class BasicInvoiceInformation
     }
 
     /**
+     * Set the payment method to cash (012)
+     * @return self
+     */
+    public function cash(): self
+    {
+        $this->paymentMethod = '012';
+        return $this;
+    }
+
+    /**
+     * Set the payment method to receivable (022)
+     * @return self
+     */
+    public function receivable(): self
+    {
+        $this->paymentMethod = '022';
+        return $this;
+    }
+
+    /**
      * Set an optional note or description for the invoice
      *
      * @param string $note The note or description

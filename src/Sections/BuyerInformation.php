@@ -9,7 +9,7 @@ class BuyerInformation
 {
     use XmlHelperTrait;
 
-    private const VALID_CITY_CODES = [
+    private const array VALID_CITY_CODES = [
         'JO-BA', // Balqa
         'JO-MN', // Ma'an
         'JO-MD', // Madaba
@@ -34,7 +34,7 @@ class BuyerInformation
 
     /**
      * Set the buyer's identification number
-     * 
+     *
      * @param string $id The identification number
      * @param string $type The type of ID (NIN, PN, or TIN)
      * @return self
@@ -54,7 +54,7 @@ class BuyerInformation
 
     /**
      * Set the buyer's postal code
-     * 
+     *
      * @param string $code The postal code
      * @return self
      */
@@ -66,7 +66,7 @@ class BuyerInformation
 
     /**
      * Set the buyer's city code
-     * 
+     *
      * @param string $code The city code
      * @return self
      */
@@ -83,7 +83,7 @@ class BuyerInformation
     /**
      * Set the buyer's name
      * Note: This is mandatory for receivable invoices or cash invoices > 10000 JOD
-     * 
+     *
      * @param string $name The buyer's name
      * @return self
      */
@@ -95,7 +95,7 @@ class BuyerInformation
 
     /**
      * Set the buyer's phone number
-     * 
+     *
      * @param string $phone The phone number
      * @return self
      */
@@ -107,7 +107,7 @@ class BuyerInformation
 
     /**
      * Set the buyer's TIN
-     * 
+     *
      * @param string $tin The buyer's TIN
      * @return self
      */
@@ -119,7 +119,7 @@ class BuyerInformation
 
     /**
      * Convert the buyer information to XML
-     * 
+     *
      * @return string The XML representation of the buyer information
      */
     public function toXml(): string
@@ -131,8 +131,8 @@ class BuyerInformation
         // Buyer identification
         if ($this->id !== null && $this->idType !== null) {
             $xml[] = '        <cac:PartyIdentification>';
-            $xml[] = sprintf('            <cbc:ID schemeID="%s">%s</cbc:ID>', 
-                $this->escapeXml($this->idType), 
+            $xml[] = sprintf('            <cbc:ID schemeID="%s">%s</cbc:ID>',
+                $this->escapeXml($this->idType),
                 $this->escapeXml($this->id)
             );
             $xml[] = '        </cac:PartyIdentification>';
@@ -142,12 +142,12 @@ class BuyerInformation
         if ($this->postalCode !== null || $this->cityCode !== null) {
             $xml[] = '        <cac:PostalAddress>';
             if ($this->postalCode !== null) {
-                $xml[] = sprintf('            <cbc:PostalZone>%s</cbc:PostalZone>', 
+                $xml[] = sprintf('            <cbc:PostalZone>%s</cbc:PostalZone>',
                     $this->escapeXml($this->postalCode)
                 );
             }
             if ($this->cityCode !== null) {
-                $xml[] = sprintf('            <cbc:CountrySubentityCode>%s</cbc:CountrySubentityCode>', 
+                $xml[] = sprintf('            <cbc:CountrySubentityCode>%s</cbc:CountrySubentityCode>',
                     $this->escapeXml($this->cityCode)
                 );
             }
@@ -160,7 +160,7 @@ class BuyerInformation
         // TIN
         if ($this->tin !== null) {
             $xml[] = '        <cac:PartyTaxScheme>';
-            $xml[] = sprintf('            <cbc:CompanyID>%s</cbc:CompanyID>', 
+            $xml[] = sprintf('            <cbc:CompanyID>%s</cbc:CompanyID>',
                 $this->escapeXml($this->tin)
             );
             $xml[] = '            <cac:TaxScheme>';
@@ -172,7 +172,7 @@ class BuyerInformation
         // Name
         if ($this->name !== null) {
             $xml[] = '        <cac:PartyLegalEntity>';
-            $xml[] = sprintf('            <cbc:RegistrationName>%s</cbc:RegistrationName>', 
+            $xml[] = sprintf('            <cbc:RegistrationName>%s</cbc:RegistrationName>',
                 $this->escapeXml($this->name)
             );
             $xml[] = '        </cac:PartyLegalEntity>';
@@ -183,7 +183,7 @@ class BuyerInformation
         // Phone
         if ($this->phone !== null) {
             $xml[] = '    <cac:AccountingContact>';
-            $xml[] = sprintf('        <cbc:Telephone>%s</cbc:Telephone>', 
+            $xml[] = sprintf('        <cbc:Telephone>%s</cbc:Telephone>',
                 $this->escapeXml($this->phone)
             );
             $xml[] = '    </cac:AccountingContact>';
@@ -197,7 +197,7 @@ class BuyerInformation
     /**
      * Get the current state of the buyer information as an array
      * This is mainly used for testing purposes
-     * 
+     *
      * @return array
      */
     public function toArray(): array
