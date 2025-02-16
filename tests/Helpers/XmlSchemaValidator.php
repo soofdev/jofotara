@@ -10,7 +10,7 @@ trait XmlSchemaValidator
     /**
      * Validate XML string against UBL 2.1 Invoice schema
      *
-     * @param string $xml The XML string to validate
+     * @param  string  $xml  The XML string to validate
      * @return array{isValid: bool, errors: LibXMLError[]} Validation result and any errors
      */
     protected function validateAgainstUblSchema(string $xml): array
@@ -20,17 +20,17 @@ trait XmlSchemaValidator
         $originalUseErrors = libxml_use_internal_errors(true);
 
         // Get absolute paths for schema directories
-        $mainSchemaDir = realpath(__DIR__ . '/../Fixtures');
-        $commonSchemaDir = realpath(__DIR__ . '/../common');
+        $mainSchemaDir = realpath(__DIR__.'/../Fixtures');
+        $commonSchemaDir = realpath(__DIR__.'/../common');
 
         // Read and modify the main schema
-        $mainSchemaPath = $mainSchemaDir . '/UBL-Invoice-2.1.xsd';
+        $mainSchemaPath = $mainSchemaDir.'/UBL-Invoice-2.1.xsd';
         $mainSchemaContent = file_get_contents($mainSchemaPath);
 
         // Replace relative paths with absolute paths in the schema
         $mainSchemaContent = str_replace(
             '../common/',
-            $commonSchemaDir . '/',
+            $commonSchemaDir.'/',
             $mainSchemaContent
         );
 
@@ -39,7 +39,7 @@ trait XmlSchemaValidator
         file_put_contents($tempSchemaFile, $mainSchemaContent);
 
         // Create a new DOM document with validation
-        $dom = new DOMDocument();
+        $dom = new DOMDocument;
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
 
@@ -59,14 +59,14 @@ trait XmlSchemaValidator
 
         return [
             'isValid' => $isValid,
-            'errors' => $errors
+            'errors' => $errors,
         ];
     }
 
     /**
      * Format LibXML errors into readable messages
      *
-     * @param LibXMLError[] $errors Array of LibXMLError objects
+     * @param  LibXMLError[]  $errors  Array of LibXMLError objects
      * @return string Formatted error message
      */
     protected function formatSchemaErrors(array $errors): string
@@ -74,20 +74,21 @@ trait XmlSchemaValidator
         $messages = [];
         foreach ($errors as $error) {
             $messages[] = sprintf(
-                "[%s] %s (Line: %d, Column: %d)",
+                '[%s] %s (Line: %d, Column: %d)',
                 $this->getErrorLevel($error->level),
                 trim($error->message),
                 $error->line,
                 $error->column
             );
         }
+
         return implode("\n", $messages);
     }
 
     /**
      * Get human-readable error level
      *
-     * @param int $level LibXML error level
+     * @param  int  $level  LibXML error level
      * @return string Human-readable error level
      */
     private function getErrorLevel(int $level): string
