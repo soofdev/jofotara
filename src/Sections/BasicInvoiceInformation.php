@@ -4,9 +4,12 @@ namespace JBadarneh\JoFotara\Sections;
 
 use DateTime;
 use InvalidArgumentException;
+use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 
 class BasicInvoiceInformation
 {
+    use XmlHelperTrait;
+    
     private string $invoiceId;
     private string $uuid;
     private DateTime $issueDate;
@@ -116,20 +119,7 @@ class BasicInvoiceInformation
      * @return string The XML representation of the basic invoice information
      * @throws InvalidArgumentException If required fields are missing
      */
-    /**
-     * Escape special characters for XML
-     *
-     * @param string|null $value The value to escape
-     * @return string|null The escaped value
-     */
-    private function escapeXml(?string $value): ?string
-    {
-        if ($value === null) {
-            return null;
-        }
 
-        return htmlspecialchars($value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
-    }
 
     public function toXml(): string
     {

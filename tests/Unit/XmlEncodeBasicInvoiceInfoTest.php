@@ -2,6 +2,31 @@
 
 use JBadarneh\JoFotara\Sections\BasicInvoiceInformation;
 
+test('it generates exact XML structure', function () {
+    $invoice = new BasicInvoiceInformation();
+    $invoice->setInvoiceId('INV001')
+            ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+            ->setIssueDate('16-02-2025')
+            ->setPaymentMethod('012')
+            ->setNote('Test invoice')
+            ->setInvoiceCounter(1);
+    
+    $expected = <<<XML
+<cbc:ID>INV001</cbc:ID>
+<cbc:UUID>123e4567-e89b-12d3-a456-426614174000</cbc:UUID>
+<cbc:IssueDate>2025-02-16</cbc:IssueDate>
+<cbc:InvoiceTypeCode name="012">388</cbc:InvoiceTypeCode>
+<cbc:Note>Test invoice</cbc:Note>
+<cbc:DocumentCurrencyCode>JOD</cbc:DocumentCurrencyCode>
+<cbc:TaxCurrencyCode>JOD</cbc:TaxCurrencyCode>
+<cac:AdditionalDocumentReference>
+    <cbc:ID>ICV</cbc:ID>
+    <cbc:UUID>1</cbc:UUID>
+</cac:AdditionalDocumentReference>
+XML;
+
+    expect($invoice->toXml())->toBe($expected);
+});
 
 test('it generates valid XML with all required fields', function () {
     $invoice = new BasicInvoiceInformation();
