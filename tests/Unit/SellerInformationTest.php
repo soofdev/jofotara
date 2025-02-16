@@ -53,11 +53,10 @@ test('it can override defaults using fluent API', function () {
 
 test('it validates input is not empty', function () {
     expect(fn () => SellerInformation::configureDefaults('', 'Test Company'))
-        ->toThrow(InvalidArgumentException::class, 'TIN cannot be empty');
-
-    expect(fn () => SellerInformation::configureDefaults('12345678', ''))
+        ->toThrow(InvalidArgumentException::class, 'TIN cannot be empty')
+        ->and(fn () => SellerInformation::configureDefaults('12345678', ''))
+        ->toThrow(InvalidArgumentException::class, 'Seller name cannot be empty')
+        ->and(fn () => SellerInformation::configureDefaults('12345678', '   '))
         ->toThrow(InvalidArgumentException::class, 'Seller name cannot be empty');
 
-    expect(fn () => SellerInformation::configureDefaults('12345678', '   '))
-        ->toThrow(InvalidArgumentException::class, 'Seller name cannot be empty');
 });

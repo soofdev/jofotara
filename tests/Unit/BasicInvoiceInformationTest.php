@@ -1,9 +1,9 @@
 <?php
 
-use JBadarneh\JoFotara\JoFotaraClass;
+use JBadarneh\JoFotara\JoFotaraService;
 
 test('it can set basic invoice information', function () {
-    $invoice = new JoFotaraClass;
+    $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
 
     $invoice->basicInformation()
         ->setInvoiceId('INV001')
@@ -25,7 +25,7 @@ test('it can set basic invoice information', function () {
 });
 
 test('it validates payment method', function () {
-    $invoice = new JoFotaraClass;
+    $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
 
     expect(fn () => $invoice->basicInformation()->setPaymentMethod('invalid'))
         ->toThrow(InvalidArgumentException::class, 'Payment method must be either 012 (cash) or 022 (receivable)');
@@ -34,7 +34,7 @@ test('it validates payment method', function () {
 });
 
 test('it validates date format', function () {
-    $invoice = new JoFotaraClass;
+    $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
 
     expect(fn () => $invoice->basicInformation()->setIssueDate('2025-02-16'))
         ->toThrow(InvalidArgumentException::class, 'Date must be in the format dd-mm-yyyy');
@@ -43,7 +43,7 @@ test('it validates date format', function () {
 });
 
 test('it validates invoice counter', function () {
-    $invoice = new JoFotaraClass;
+    $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
 
     expect(fn () => $invoice->basicInformation()->setInvoiceCounter(0))
         ->toThrow(InvalidArgumentException::class, 'Invoice counter must be greater than 0');
@@ -52,7 +52,7 @@ test('it validates invoice counter', function () {
 });
 
 test('it accepts DateTime object for issue date', function () {
-    $invoice = new JoFotaraClass;
+    $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
     $date = new DateTime('2025-02-16');
 
     $invoice->basicInformation()->setIssueDate($date);

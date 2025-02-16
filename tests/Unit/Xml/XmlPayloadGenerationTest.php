@@ -1,9 +1,9 @@
 <?php
 
-use JBadarneh\JoFotara\JoFotaraClass;
+use JBadarneh\JoFotara\JoFotaraService;
 
 test('generates valid XML for cash invoice with tax exempt item', function () {
-    $invoice = new JoFotaraClass;
+    $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
 
     // 1. Basic Information
     $invoice->basicInformation()
@@ -140,7 +140,7 @@ XML;
 });
 
 test('it throws exception when manually set totals do not match item calculations', function () {
-    $invoice = new JoFotaraClass;
+    $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
 
     // Set up basic invoice info
     $invoice->basicInformation()
@@ -172,7 +172,7 @@ test('it throws exception when manually set totals do not match item calculation
 });
 
 test('it auto-calculates invoice totals correctly', function () {
-    $invoice = new JoFotaraClass;
+    $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
 
     // Set up basic invoice info
     $invoice->basicInformation()

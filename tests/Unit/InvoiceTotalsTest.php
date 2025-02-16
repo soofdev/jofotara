@@ -18,12 +18,12 @@ test('it validates tax inclusive amount', function () {
     expect(fn () => $totals->setTaxInclusiveAmount(-1))->toThrow(
         InvalidArgumentException::class,
         'Tax inclusive amount cannot be negative'
-    );
+    )
+        ->and(fn () => $totals->setTaxInclusiveAmount(90))->toThrow(
+            InvalidArgumentException::class,
+            'Tax inclusive amount cannot be less than tax exclusive amount'
+        );
 
-    expect(fn () => $totals->setTaxInclusiveAmount(90))->toThrow(
-        InvalidArgumentException::class,
-        'Tax inclusive amount cannot be less than tax exclusive amount'
-    );
 });
 
 test('it validates discount total amount', function () {
@@ -33,12 +33,12 @@ test('it validates discount total amount', function () {
     expect(fn () => $totals->setDiscountTotalAmount(-1))->toThrow(
         InvalidArgumentException::class,
         'Discount total amount cannot be negative'
-    );
+    )
+        ->and(fn () => $totals->setDiscountTotalAmount(101))->toThrow(
+            InvalidArgumentException::class,
+            'Discount total amount cannot be greater than tax exclusive amount'
+        );
 
-    expect(fn () => $totals->setDiscountTotalAmount(101))->toThrow(
-        InvalidArgumentException::class,
-        'Discount total amount cannot be greater than tax exclusive amount'
-    );
 });
 
 test('it validates tax total amount', function () {
@@ -49,12 +49,12 @@ test('it validates tax total amount', function () {
     expect(fn () => $totals->setTaxTotalAmount(-1))->toThrow(
         InvalidArgumentException::class,
         'Tax total amount cannot be negative'
-    );
+    )
+        ->and(fn () => $totals->setTaxTotalAmount(20))->toThrow(
+            InvalidArgumentException::class,
+            'Tax total amount would make tax inclusive amount invalid'
+        );
 
-    expect(fn () => $totals->setTaxTotalAmount(20))->toThrow(
-        InvalidArgumentException::class,
-        'Tax total amount would make tax inclusive amount invalid'
-    );
 });
 
 test('it validates payable amount', function () {
@@ -66,12 +66,12 @@ test('it validates payable amount', function () {
     expect(fn () => $totals->setPayableAmount(-1))->toThrow(
         InvalidArgumentException::class,
         'Payable amount cannot be negative'
-    );
+    )
+        ->and(fn () => $totals->setPayableAmount(90))->toThrow(
+            InvalidArgumentException::class,
+            'Payable amount cannot be less than tax inclusive amount minus allowances'
+        );
 
-    expect(fn () => $totals->setPayableAmount(90))->toThrow(
-        InvalidArgumentException::class,
-        'Payable amount cannot be less than tax inclusive amount minus allowances'
-    );
 });
 
 test('it returns array representation', function () {

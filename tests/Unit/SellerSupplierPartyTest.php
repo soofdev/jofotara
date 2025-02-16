@@ -7,12 +7,12 @@ test('it requires sequence of income source', function () {
 
     expect($supplier->toArray())->toBe([
         'sequenceId' => null,
-    ]);
+    ])
+        ->and(fn () => $supplier->toXml())->toThrow(
+            InvalidArgumentException::class,
+            'Sequence of income source is required'
+        );
 
-    expect(fn () => $supplier->toXml())->toThrow(
-        InvalidArgumentException::class,
-        'Sequence of income source is required'
-    );
 });
 
 test('it returns array representation', function () {

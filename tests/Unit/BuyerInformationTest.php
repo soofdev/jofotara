@@ -6,28 +6,26 @@ test('it validates city codes', function () {
     $buyer = new BuyerInformation;
 
     // Valid city code should work
-    expect(fn () => $buyer->setCityCode('JO-AM'))->not->toThrow(InvalidArgumentException::class);
-
-    // Invalid city code should throw
-    expect(fn () => $buyer->setCityCode('JO-XX'))->toThrow(
-        InvalidArgumentException::class,
-        'City code must be one of: JO-BA, JO-MN, JO-MD, JO-MA, JO-KA, JO-JA, JO-IR, JO-AZ, JO-AT, JO-AQ, JO-AM, JO-AJ'
-    );
+    expect(fn () => $buyer->setCityCode('JO-AM'))->not->toThrow(InvalidArgumentException::class)
+        // Invalid city code should throw
+        ->and(fn () => $buyer->setCityCode('JO-XX'))->toThrow(
+            InvalidArgumentException::class,
+            'City code must be one of: JO-BA, JO-MN, JO-MD, JO-MA, JO-KA, JO-JA, JO-IR, JO-AZ, JO-AT, JO-AQ, JO-AM, JO-AJ'
+        );
 });
 
 test('it validates ID types', function () {
     $buyer = new BuyerInformation;
 
     // Valid ID types should work
-    expect(fn () => $buyer->setId('123456789', 'NIN'))->not->toThrow(InvalidArgumentException::class);
-    expect(fn () => $buyer->setId('P123456', 'PN'))->not->toThrow(InvalidArgumentException::class);
-    expect(fn () => $buyer->setId('987654321', 'TIN'))->not->toThrow(InvalidArgumentException::class);
-
-    // Invalid ID type should throw
-    expect(fn () => $buyer->setId('123456789', 'XXX'))->toThrow(
-        InvalidArgumentException::class,
-        'ID type must be one of: NIN, PN, TIN'
-    );
+    expect(fn () => $buyer->setId('123456789', 'NIN'))->not->toThrow(InvalidArgumentException::class)
+        ->and(fn () => $buyer->setId('P123456', 'PN'))->not->toThrow(InvalidArgumentException::class)
+        ->and(fn () => $buyer->setId('987654321', 'TIN'))->not->toThrow(InvalidArgumentException::class)
+        // Invalid ID type should throw
+        ->and(fn () => $buyer->setId('123456789', 'XXX'))->toThrow(
+            InvalidArgumentException::class,
+            'ID type must be one of: NIN, PN, TIN'
+        );
 });
 
 test('it returns array representation with all fields', function () {

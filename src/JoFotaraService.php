@@ -9,9 +9,12 @@ use JBadarneh\JoFotara\Sections\InvoiceItems;
 use JBadarneh\JoFotara\Sections\InvoiceTotals;
 use JBadarneh\JoFotara\Sections\SellerInformation;
 use JBadarneh\JoFotara\Sections\SellerSupplierParty;
+use RuntimeException;
 
-class JoFotaraClass
+class JoFotaraService
 {
+    private const string API_URL = 'https://backend.jofotara.gov.jo/core/invoices/';
+
     private BasicInvoiceInformation $basicInfo;
 
     private ?SellerInformation $sellerInfo = null;
@@ -24,8 +27,18 @@ class JoFotaraClass
 
     private ?InvoiceTotals $invoiceTotals = null;
 
-    public function __construct()
+    private string $clientId;
+
+    private string $clientSecret;
+
+    public function __construct(string $clientId, string $clientSecret)
     {
+        if (empty($clientId) || empty($clientSecret)) {
+            throw new InvalidArgumentException('JoFotara client ID and secret are required');
+        }
+
+        $this->clientId = $clientId;
+        $this->clientSecret = $clientSecret;
         $this->basicInfo = new BasicInvoiceInformation;
     }
 
@@ -219,13 +232,64 @@ class JoFotaraClass
     }
 
     /**
+     * Encode the XML invoice to base64
+     *
+     * @return string Base64 encoded XML
+     *
+     * @throws InvalidArgumentException If XML generation fails
+     */
+    public function encodeInvoice(): string
+    {
+        $xml = $this->generateXml();
+
+        return base64_encode($xml);
+    }
+
+    /**
      * Send the invoice to the JoFotara API
      *
-     * @return array The API response
+     * @return array Response from the API containing success status and QR code if successful
+     *
+     * @throws InvalidArgumentException If configuration is missing
+     * @throws RuntimeException If the API request fails
      */
     public function send(): array
     {
-        // This will be implemented to handle API communication
-        return [];
+
+        $encodedInvoice = $this->encodeInvoice();
+
+        $ch = curl_init(self::API_URL);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => [
+                'Client-Id: '.$this->clientId,
+                'Secret-Key: '.$this->clientSecret,
+                'Content-Type: application/json',
+            ],
+            CURLOPT_POSTFIELDS => json_encode([
+                'invoice' => $encodedInvoice,
+            ]),
+        ]);
+
+        $response = curl_exec($ch);
+        $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($error) {
+            throw new RuntimeException('Failed to send invoice: '.$error);
+        }
+
+        if ($statusCode !== 200) {
+            throw new RuntimeException('API request failed with status code '.$statusCode);
+        }
+
+        $result = json_decode($response, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new RuntimeException('Failed to parse API response');
+        }
+
+        return $result;
     }
 }
