@@ -7,7 +7,7 @@ uses(XmlSchemaValidator::class);
 
 test('generates a valid XML payload as per the UBL 2.1 schema', function () {
     $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
-    
+
     // 1. Basic Information
     $invoice->basicInformation()
         ->setInvoiceId('INV-001')
@@ -93,7 +93,7 @@ test('generates valid XML for cash invoice with tax exempt item', function () {
 
     $expectedXml = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
-<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2.1" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
 <cbc:UBLVersionID>2.1</cbc:UBLVersionID>
 <cbc:ID>INV-001</cbc:ID>
 <cbc:UUID>123e4567-e89b-12d3-a456-426614174000</cbc:UUID>

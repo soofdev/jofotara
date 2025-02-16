@@ -192,11 +192,7 @@ class JoFotaraService
         $xml[] = '<?xml version="1.0" encoding="UTF-8"?>';
 
         // Add root element with namespaces UBL2.1 standard
-        $xml[] = '<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" ' .
-                 'xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" ' .
-                 'xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" ' .
-                 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' .
-                 'xsi:schemaLocation="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2.1 UBL-Invoice-2.1.xsd">';
+        $xml[] = '<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">';
 
         // Add UBLVersionID
         $xml[] = '<cbc:UBLVersionID>2.1</cbc:UBLVersionID>';
