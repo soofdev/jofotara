@@ -109,7 +109,7 @@ The supplier income source sequence (تسلسل مصدر الدخل) is a requir
 $invoice->supplierIncomeSource('123456789');
 ```
 
-> **Important**: The supplier income source sequence is mandatory and must be set before generating the invoice XML. You can find this value in your JoFotara portal under the income sources section (مصادر الدخل).
+> **Important**: The supplier income source sequence is mandatory and must be set before generating the invoice XML. You can find this value in the table where it shows your client ID and secret, under column "تسلسل مصدر الدخل".
 
 Example usage in a complete invoice:
 
