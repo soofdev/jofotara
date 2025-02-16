@@ -170,3 +170,38 @@ test('it throws exception when manually set totals do not match item calculation
         'Invoice totals do not match calculated values from line items'
     );
 });
+
+test('it auto-calculates invoice totals correctly', function () {
+    $invoice = new JoFotaraClass;
+
+    // Set up basic invoice info
+    $invoice->basicInformation()
+        ->setInvoiceId('INV-001')
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025')
+        ->cash();
+
+    // Add item with tax exclusive amount of 100 and 16% tax
+    $invoice->items()
+        ->addItem('1')
+        ->setQuantity(1)
+        ->setUnitPrice(100.0)
+        ->setDescription('Test Item')
+        ->tax(16);
+
+    // Let the totals be calculated automatically
+    $invoice->invoiceTotals();
+
+    $xml = $invoice->generateXml();
+
+    // Tax Total section
+    expect($xml)->toContain('<cac:TaxTotal>')
+        ->and($xml)->toContain('<cbc:TaxAmount currencyID="JOD">16.00</cbc:TaxAmount>')
+        ->and($xml)->toContain('<cbc:LineExtensionAmount currencyID="JOD">100.00</cbc:LineExtensionAmount>')
+        ->and($xml)->toContain('<cbc:Percent>16.00</cbc:Percent>')
+        // Legal Monetary Total section
+        ->and($xml)->toContain('<cac:LegalMonetaryTotal>')
+        ->and($xml)->toContain('<cbc:TaxExclusiveAmount currencyID="JOD">100.00</cbc:TaxExclusiveAmount>')
+        ->and($xml)->toContain('<cbc:TaxInclusiveAmount currencyID="JOD">116.00</cbc:TaxInclusiveAmount>')
+        ->and($xml)->toContain('<cbc:PayableAmount currencyID="JOD">116.00</cbc:PayableAmount>');
+});
