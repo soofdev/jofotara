@@ -138,3 +138,35 @@ XML;
 
     expect($invoice->generateXml())->toBe($expectedXml);
 });
+
+test('it throws exception when manually set totals do not match item calculations', function () {
+    $invoice = new JoFotaraClass;
+
+    // Set up basic invoice info
+    $invoice->basicInformation()
+        ->setInvoiceId('INV-001')
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025')
+        ->cash();
+
+    // Add item with tax exclusive amount of 100 and 16% tax
+    $invoice->items()
+        ->addItem('1')
+        ->setQuantity(1)
+        ->setUnitPrice(100.0)
+        ->setDescription('Test Item')
+        ->tax(16);
+
+    // Set invalid totals manually
+    $invoice->invoiceTotals()
+        ->setTaxExclusiveAmount(90)  // Should be 100
+        ->setTaxInclusiveAmount(100) // Should be 116
+        ->setTaxTotalAmount(10)      // Should be 16
+        ->setPayableAmount(100);     // Should be 116
+
+    // generateXml should throw an exception due to invalid totals
+    expect(fn () => $invoice->generateXml())->toThrow(
+        InvalidArgumentException::class,
+        'Invoice totals do not match calculated values from line items'
+    );
+});

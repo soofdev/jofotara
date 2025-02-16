@@ -162,7 +162,7 @@ class JoFotaraClass
                 $expectedTotals = $calculatedTotals->toArray();
 
                 if ($providedTotals !== $expectedTotals) {
-                    throw new InvalidArgumentException('Invoice totals do not match the sum of line items');
+                    throw new InvalidArgumentException('Invoice totals do not match calculated values from line items');
                 }
             }
         }
