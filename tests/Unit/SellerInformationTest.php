@@ -8,9 +8,9 @@ beforeEach(function () {
 });
 
 test('it can set seller information using fluent API', function () {
-    $seller = new SellerInformation();
+    $seller = new SellerInformation;
     $seller->setTin('12345678')
-           ->setName('Test Company');
+        ->setName('Test Company');
 
     $data = $seller->toArray();
 
@@ -26,7 +26,7 @@ test('it uses configured defaults', function () {
         name: 'Default Company'
     );
 
-    $seller = new SellerInformation();
+    $seller = new SellerInformation;
     $data = $seller->toArray();
 
     expect($data)
@@ -41,7 +41,7 @@ test('it can override defaults using fluent API', function () {
         name: 'Default Company'
     );
 
-    $seller = new SellerInformation();
+    $seller = new SellerInformation;
     $seller->setName('Custom Company');
     $data = $seller->toArray();
 
@@ -52,12 +52,12 @@ test('it can override defaults using fluent API', function () {
 });
 
 test('it validates input is not empty', function () {
-    expect(fn() => SellerInformation::configureDefaults('', 'Test Company'))
+    expect(fn () => SellerInformation::configureDefaults('', 'Test Company'))
         ->toThrow(InvalidArgumentException::class, 'TIN cannot be empty');
 
-    expect(fn() => SellerInformation::configureDefaults('12345678', ''))
+    expect(fn () => SellerInformation::configureDefaults('12345678', ''))
         ->toThrow(InvalidArgumentException::class, 'Seller name cannot be empty');
 
-    expect(fn() => SellerInformation::configureDefaults('12345678', '   '))
+    expect(fn () => SellerInformation::configureDefaults('12345678', '   '))
         ->toThrow(InvalidArgumentException::class, 'Seller name cannot be empty');
 });

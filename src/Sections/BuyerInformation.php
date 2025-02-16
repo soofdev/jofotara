@@ -25,58 +25,65 @@ class BuyerInformation
     ];
 
     private ?string $id = null;
+
     private ?string $idType = null;
+
     private ?string $postalCode = null;
+
     private ?string $cityCode = null;
+
     private ?string $name = null;
+
     private ?string $phone = null;
+
     private ?string $tin = null;
 
     /**
      * Set the buyer's identification number
      *
-     * @param string $id The identification number
-     * @param string $type The type of ID (NIN, PN, or TIN)
-     * @return self
+     * @param  string  $id  The identification number
+     * @param  string  $type  The type of ID (NIN, PN, or TIN)
+     *
      * @throws InvalidArgumentException If the ID type is invalid
      */
     public function setId(string $id, string $type): self
     {
         $validTypes = ['NIN', 'PN', 'TIN'];
-        if (!in_array($type, $validTypes)) {
-            throw new InvalidArgumentException('ID type must be one of: ' . implode(', ', $validTypes));
+        if (! in_array($type, $validTypes)) {
+            throw new InvalidArgumentException('ID type must be one of: '.implode(', ', $validTypes));
         }
 
         $this->id = $id;
         $this->idType = $type;
+
         return $this;
     }
 
     /**
      * Set the buyer's postal code
      *
-     * @param string $code The postal code
-     * @return self
+     * @param  string  $code  The postal code
      */
     public function setPostalCode(string $code): self
     {
         $this->postalCode = $code;
+
         return $this;
     }
 
     /**
      * Set the buyer's city code
      *
-     * @param string $code The city code
-     * @return self
+     * @param  string  $code  The city code
      */
     public function setCityCode(string $code): self
     {
-        if (!in_array($code, self::VALID_CITY_CODES)) {
-            throw new InvalidArgumentException('City code must be one of: ' . implode(', ', self::VALID_CITY_CODES));
+        if (! in_array($code, self::VALID_CITY_CODES)) {
+            throw new InvalidArgumentException('City code must be one of: '.implode(', ', self::VALID_CITY_CODES));
         }
 
         $this->cityCode = $code;
+
         return $this;
     }
 
@@ -84,36 +91,36 @@ class BuyerInformation
      * Set the buyer's name
      * Note: This is mandatory for receivable invoices or cash invoices > 10000 JOD
      *
-     * @param string $name The buyer's name
-     * @return self
+     * @param  string  $name  The buyer's name
      */
     public function setName(string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
     /**
      * Set the buyer's phone number
      *
-     * @param string $phone The phone number
-     * @return self
+     * @param  string  $phone  The phone number
      */
     public function setPhone(string $phone): self
     {
         $this->phone = $phone;
+
         return $this;
     }
 
     /**
      * Set the buyer's TIN
      *
-     * @param string $tin The buyer's TIN
-     * @return self
+     * @param  string  $tin  The buyer's TIN
      */
     public function setTin(string $tin): self
     {
         $this->tin = $tin;
+
         return $this;
     }
 
@@ -197,8 +204,6 @@ class BuyerInformation
     /**
      * Get the current state of the buyer information as an array
      * This is mainly used for testing purposes
-     *
-     * @return array
      */
     public function toArray(): array
     {

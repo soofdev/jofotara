@@ -4,31 +4,33 @@ namespace JBadarneh\JoFotara;
 
 use InvalidArgumentException;
 use JBadarneh\JoFotara\Sections\BasicInvoiceInformation;
-use JBadarneh\JoFotara\Sections\InvoiceTotals;
-use JBadarneh\JoFotara\Sections\SellerInformation;
 use JBadarneh\JoFotara\Sections\BuyerInformation;
 use JBadarneh\JoFotara\Sections\InvoiceItems;
-use JBadarneh\JoFotara\Sections\MonetaryTotals;
+use JBadarneh\JoFotara\Sections\InvoiceTotals;
+use JBadarneh\JoFotara\Sections\SellerInformation;
 use JBadarneh\JoFotara\Sections\SellerSupplierParty;
 
 class JoFotaraClass
 {
     private BasicInvoiceInformation $basicInfo;
+
     private ?SellerInformation $sellerInfo = null;
+
     private ?BuyerInformation $buyerInfo = null;
+
     private ?SellerSupplierParty $supplierParty = null;
+
     private ?InvoiceItems $items = null;
+
     private ?InvoiceTotals $invoiceTotals = null;
 
     public function __construct()
     {
-        $this->basicInfo = new BasicInvoiceInformation();
+        $this->basicInfo = new BasicInvoiceInformation;
     }
 
     /**
      * Get the basic invoice information section builder
-     *
-     * @return BasicInvoiceInformation
      */
     public function basicInformation(): BasicInvoiceInformation
     {
@@ -37,65 +39,59 @@ class JoFotaraClass
 
     /**
      * Get the seller information section builder
-     *
-     * @return SellerInformation
      */
     public function sellerInformation(): SellerInformation
     {
-        if (!$this->sellerInfo) {
-            $this->sellerInfo = new SellerInformation();
+        if (! $this->sellerInfo) {
+            $this->sellerInfo = new SellerInformation;
         }
+
         return $this->sellerInfo;
     }
 
     /**
      * Get the buyer information section builder
-     *
-     * @return BuyerInformation
      */
     public function buyerInformation(): BuyerInformation
     {
-        if (!$this->buyerInfo) {
-            $this->buyerInfo = new BuyerInformation();
+        if (! $this->buyerInfo) {
+            $this->buyerInfo = new BuyerInformation;
         }
+
         return $this->buyerInfo;
     }
 
     /**
      * Get the supplier information section builder
-     *
-     * @return SellerSupplierParty
      */
     public function supplierInformation(): SellerSupplierParty
     {
-        if (!$this->supplierParty) {
-            $this->supplierParty = new SellerSupplierParty();
+        if (! $this->supplierParty) {
+            $this->supplierParty = new SellerSupplierParty;
         }
+
         return $this->supplierParty;
     }
 
     /**
      * Get the invoice items section builder
-     *
-     * @return InvoiceItems
      */
     public function items(): InvoiceItems
     {
-        if (!$this->items) {
-            $this->items = new InvoiceItems();
+        if (! $this->items) {
+            $this->items = new InvoiceItems;
         }
+
         return $this->items;
     }
 
     /**
      * Get the monetary totals section builder
-     *
-     * @return InvoiceTotals
      */
     public function invoiceTotals(): InvoiceTotals
     {
-        if (!$this->invoiceTotals) {
-            $this->invoiceTotals = new InvoiceTotals();
+        if (! $this->invoiceTotals) {
+            $this->invoiceTotals = new InvoiceTotals;
 
             // If we have items, calculate totals from them
             if ($this->items && count($this->items->getItems()) > 0) {
@@ -120,6 +116,7 @@ class JoFotaraClass
                     ->setPayableAmount($payableAmount);
             }
         }
+
         return $this->invoiceTotals;
     }
 
@@ -139,7 +136,7 @@ class JoFotaraClass
         if ($this->items && $this->invoiceTotals) {
             $items = $this->items->getItems();
             if (count($items) > 0) {
-                $calculatedTotals = new InvoiceTotals();
+                $calculatedTotals = new InvoiceTotals;
 
                 $taxExclusiveAmount = 0.0;
                 $taxTotalAmount = 0.0;

@@ -10,12 +10,19 @@ class InvoiceLineItem
     use XmlHelperTrait;
 
     private string $id;
+
     private float $quantity;
+
     private float $unitPrice;
+
     private float $discount = 0.0;
+
     private string $description;
+
     private string $taxCategory = 'S'; // Default to standard rate
+
     private float $taxPercent = 16.0; // Default to 16%
+
     private string $unitCode = 'PCE'; // Default to piece
 
     public function __construct(string $id)
@@ -26,8 +33,8 @@ class InvoiceLineItem
     /**
      * Set the quantity
      *
-     * @param float $quantity The quantity of items
-     * @return self
+     * @param  float  $quantity  The quantity of items
+     *
      * @throws InvalidArgumentException If quantity is not positive
      */
     public function setQuantity(float $quantity): self
@@ -36,14 +43,15 @@ class InvoiceLineItem
             throw new InvalidArgumentException('Quantity must be greater than 0');
         }
         $this->quantity = $quantity;
+
         return $this;
     }
 
     /**
      * Set the unit price before tax
      *
-     * @param float $price The unit price
-     * @return self
+     * @param  float  $price  The unit price
+     *
      * @throws InvalidArgumentException If price is negative
      */
     public function setUnitPrice(float $price): self
@@ -52,14 +60,15 @@ class InvoiceLineItem
             throw new InvalidArgumentException('Unit price cannot be negative');
         }
         $this->unitPrice = $price;
+
         return $this;
     }
 
     /**
      * Set the discount amount for this item
      *
-     * @param float $amount The discount amount
-     * @return self
+     * @param  float  $amount  The discount amount
+     *
      * @throws InvalidArgumentException If discount is negative or greater than total amount
      */
     public function setDiscount(float $amount): self
@@ -73,25 +82,24 @@ class InvoiceLineItem
         }
 
         $this->discount = $amount;
+
         return $this;
     }
 
     /**
      * Set the item description
      *
-     * @param string $description The item description
-     * @return self
+     * @param  string  $description  The item description
      */
     public function setDescription(string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
     /**
      * Set the item as tax exempted (0% tax rate)
-     *
-     * @return self
      */
     public function taxExempted(): self
     {
@@ -100,8 +108,6 @@ class InvoiceLineItem
 
     /**
      * Set the item as zero rated (0% tax rate)
-     *
-     * @return self
      */
     public function zeroTax(): self
     {
@@ -111,8 +117,8 @@ class InvoiceLineItem
     /**
      * Set the item's tax rate (standard rate category)
      *
-     * @param float $rate The tax rate (1-16%)
-     * @return self
+     * @param  float  $rate  The tax rate (1-16%)
+     *
      * @throws InvalidArgumentException If rate is invalid
      */
     public function tax(float $rate): self
@@ -122,7 +128,6 @@ class InvoiceLineItem
 
     /**
      * Get the discount amount for this item
-     * @return float
      */
     public function getDiscount(): float
     {
@@ -135,15 +140,15 @@ class InvoiceLineItem
      * O = Zero rated (0%)
      * S = Standard rate (1-16%)
      *
-     * @param string $category The tax category (Z, O, or S)
-     * @param float|null $percent The tax percentage (required for category S)
-     * @return self
+     * @param  string  $category  The tax category (Z, O, or S)
+     * @param  float|null  $percent  The tax percentage (required for category S)
+     *
      * @throws InvalidArgumentException If category or percentage is invalid
      */
     public function setTaxCategory(string $category, ?float $percent = null): self
     {
         $validCategories = ['Z', 'O', 'S'];
-        if (!in_array($category, $validCategories)) {
+        if (! in_array($category, $validCategories)) {
             throw new InvalidArgumentException('Tax category must be Z, O, or S');
         }
 
@@ -160,21 +165,21 @@ class InvoiceLineItem
         }
 
         $this->taxCategory = $category;
+
         return $this;
     }
 
     /**
      * Calculate the amount before tax (quantity * unit price - discount)
      *
-     * @return float
      * @throws InvalidArgumentException If quantity or unit price is not set
      */
     public function getTaxExclusiveAmount(): float
     {
-        if (!isset($this->quantity)) {
+        if (! isset($this->quantity)) {
             throw new InvalidArgumentException('Quantity is required to calculate tax exclusive amount');
         }
-        if (!isset($this->unitPrice)) {
+        if (! isset($this->unitPrice)) {
             throw new InvalidArgumentException('Unit price is required to calculate tax exclusive amount');
         }
 
@@ -184,19 +189,18 @@ class InvoiceLineItem
     /**
      * Calculate the tax amount for this line item
      *
-     * @return float
      * @throws InvalidArgumentException If quantity or unit price is not set
      */
     public function getTaxAmount(): float
     {
         $taxExclusiveAmount = $this->getTaxExclusiveAmount();
+
         return $this->taxCategory === 'S' ? $taxExclusiveAmount * ($this->taxPercent / 100) : 0;
     }
 
     /**
      * Calculate the total amount including tax
      *
-     * @return float
      * @throws InvalidArgumentException If quantity or unit price is not set
      */
     public function getTaxInclusiveAmount(): float
@@ -207,18 +211,17 @@ class InvoiceLineItem
     /**
      * Convert the line item to XML
      *
-     * @return string
      * @throws InvalidArgumentException If required fields are missing
      */
     public function toXml(): string
     {
-        if (!isset($this->quantity)) {
+        if (! isset($this->quantity)) {
             throw new InvalidArgumentException('Quantity is required');
         }
-        if (!isset($this->unitPrice)) {
+        if (! isset($this->unitPrice)) {
             throw new InvalidArgumentException('Unit price is required');
         }
-        if (!isset($this->description)) {
+        if (! isset($this->description)) {
             throw new InvalidArgumentException('Description is required');
         }
 
@@ -276,8 +279,6 @@ class InvoiceLineItem
 
     /**
      * Get the current state as an array
-     *
-     * @return array
      */
     public function toArray(): array
     {

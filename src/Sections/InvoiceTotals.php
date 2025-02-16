@@ -10,16 +10,20 @@ class InvoiceTotals
     use XmlHelperTrait;
 
     private float $taxExclusiveAmount = 0.0;
+
     private float $taxInclusiveAmount = 0.0;
+
     private float $discountTotalAmount = 0.0;
+
     private float $taxTotalAmount = 0.0;
+
     private float $payableAmount = 0.0;
 
     /**
      * Set the total amount before tax and discounts
-     * 
-     * @param float $amount The tax exclusive amount
-     * @return self
+     *
+     * @param  float  $amount  The tax exclusive amount
+     *
      * @throws InvalidArgumentException If amount is negative
      */
     public function setTaxExclusiveAmount(float $amount): self
@@ -29,14 +33,15 @@ class InvoiceTotals
         }
 
         $this->taxExclusiveAmount = $amount;
+
         return $this;
     }
 
     /**
      * Set the total amount including tax
-     * 
-     * @param float $amount The tax inclusive amount
-     * @return self
+     *
+     * @param  float  $amount  The tax inclusive amount
+     *
      * @throws InvalidArgumentException If amount is less than tax exclusive amount
      */
     public function setTaxInclusiveAmount(float $amount): self
@@ -50,6 +55,7 @@ class InvoiceTotals
         }
 
         $this->taxInclusiveAmount = $amount;
+
         return $this;
     }
 
@@ -57,9 +63,9 @@ class InvoiceTotals
      * Set the total discount amount
      * Note: Discounts must be distributed to goods/services, not applied to the total invoice
      * If not set, defaults to 0
-     * 
-     * @param float|null $amount The total discount amount
-     * @return self
+     *
+     * @param  float|null  $amount  The total discount amount
+     *
      * @throws InvalidArgumentException If amount is negative or greater than tax exclusive amount
      */
     public function setDiscountTotalAmount(?float $amount = null): self
@@ -75,14 +81,15 @@ class InvoiceTotals
         }
 
         $this->discountTotalAmount = $amount;
+
         return $this;
     }
 
     /**
      * Set the total tax amount
-     * 
-     * @param float $amount The total tax amount
-     * @return self
+     *
+     * @param  float  $amount  The total tax amount
+     *
      * @throws InvalidArgumentException If amount is negative or if it makes tax inclusive amount invalid
      */
     public function setTaxTotalAmount(float $amount): self
@@ -96,14 +103,15 @@ class InvoiceTotals
         }
 
         $this->taxTotalAmount = $amount;
+
         return $this;
     }
 
     /**
      * Set the final payable amount
-     * 
-     * @param float $amount The payable amount
-     * @return self
+     *
+     * @param  float  $amount  The payable amount
+     *
      * @throws InvalidArgumentException If amount is negative or less than tax inclusive amount minus allowances
      */
     public function setPayableAmount(float $amount): self
@@ -117,12 +125,13 @@ class InvoiceTotals
         }
 
         $this->payableAmount = $amount;
+
         return $this;
     }
 
     /**
      * Convert the invoice totals to XML
-     * 
+     *
      * @return string The XML representation
      */
     public function toXml(): string
@@ -155,18 +164,18 @@ class InvoiceTotals
 
         // Monetary totals
         $xml[] = '<cac:LegalMonetaryTotal>';
-        $xml[] = sprintf('    <cbc:TaxExclusiveAmount currencyID="JOD">%.2f</cbc:TaxExclusiveAmount>', 
+        $xml[] = sprintf('    <cbc:TaxExclusiveAmount currencyID="JOD">%.2f</cbc:TaxExclusiveAmount>',
             $this->taxExclusiveAmount
         );
-        $xml[] = sprintf('    <cbc:TaxInclusiveAmount currencyID="JOD">%.2f</cbc:TaxInclusiveAmount>', 
+        $xml[] = sprintf('    <cbc:TaxInclusiveAmount currencyID="JOD">%.2f</cbc:TaxInclusiveAmount>',
             $this->taxInclusiveAmount
         );
         if ($this->discountTotalAmount > 0) {
-            $xml[] = sprintf('    <cbc:AllowanceTotalAmount currencyID="JOD">%.2f</cbc:AllowanceTotalAmount>', 
+            $xml[] = sprintf('    <cbc:AllowanceTotalAmount currencyID="JOD">%.2f</cbc:AllowanceTotalAmount>',
                 $this->discountTotalAmount
             );
         }
-        $xml[] = sprintf('    <cbc:PayableAmount currencyID="JOD">%.2f</cbc:PayableAmount>', 
+        $xml[] = sprintf('    <cbc:PayableAmount currencyID="JOD">%.2f</cbc:PayableAmount>',
             $this->payableAmount
         );
         $xml[] = '</cac:LegalMonetaryTotal>';
@@ -177,8 +186,6 @@ class InvoiceTotals
     /**
      * Get the current state as an array
      * This is mainly used for testing purposes
-     * 
-     * @return array
      */
     public function toArray(): array
     {

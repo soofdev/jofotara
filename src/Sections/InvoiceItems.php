@@ -13,9 +13,8 @@ class InvoiceItems
 
     /**
      * Add a new line item to the invoice
-     * 
-     * @param string $id Unique serial number for this line item
-     * @return InvoiceLineItem
+     *
+     * @param  string  $id  Unique serial number for this line item
      */
     public function addItem(string $id): InvoiceLineItem
     {
@@ -25,12 +24,13 @@ class InvoiceItems
 
         $item = new InvoiceLineItem($id);
         $this->items[$id] = $item;
+
         return $item;
     }
 
     /**
      * Get all line items
-     * 
+     *
      * @return array<string, InvoiceLineItem>
      */
     public function getItems(): array
@@ -40,7 +40,7 @@ class InvoiceItems
 
     /**
      * Convert all invoice items to XML
-     * 
+     *
      * @return string The XML representation
      */
     public function toXml(): string
@@ -60,8 +60,6 @@ class InvoiceItems
     /**
      * Get the current state as an array
      * This is mainly used for testing purposes
-     * 
-     * @return array
      */
     public function toArray(): array
     {
@@ -69,6 +67,7 @@ class InvoiceItems
         foreach ($this->items as $id => $item) {
             $items[$id] = $item->toArray();
         }
+
         return $items;
     }
 }

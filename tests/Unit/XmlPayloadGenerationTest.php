@@ -3,7 +3,7 @@
 use JBadarneh\JoFotara\JoFotaraClass;
 
 test('generates valid XML for cash invoice with tax exempt item', function () {
-    $invoice = new JoFotaraClass();
+    $invoice = new JoFotaraClass;
 
     // 1. Basic Information
     $invoice->basicInformation()
@@ -39,7 +39,7 @@ test('generates valid XML for cash invoice with tax exempt item', function () {
     // 6. Invoice Totals (will be auto-calculated)
     $invoice->invoiceTotals();
 
-    $expectedXml = <<<XML
+    $expectedXml = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2.1" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
 <cbc:UBLVersionID>2.1</cbc:UBLVersionID>
@@ -138,4 +138,3 @@ XML;
 
     expect($invoice->generateXml())->toBe($expectedXml);
 });
-

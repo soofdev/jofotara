@@ -3,15 +3,15 @@
 use JBadarneh\JoFotara\Sections\BasicInvoiceInformation;
 
 test('it generates exact XML structure', function () {
-    $invoice = new BasicInvoiceInformation();
+    $invoice = new BasicInvoiceInformation;
     $invoice->setInvoiceId('INV001')
-            ->setUuid('123e4567-e89b-12d3-a456-426614174000')
-            ->setIssueDate('16-02-2025')
-            ->setPaymentMethod('012')
-            ->setNote('Test invoice')
-            ->setInvoiceCounter(1);
-    
-    $expected = <<<XML
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025')
+        ->setPaymentMethod('012')
+        ->setNote('Test invoice')
+        ->setInvoiceCounter(1);
+
+    $expected = <<<'XML'
 <cbc:ID>INV001</cbc:ID>
 <cbc:UUID>123e4567-e89b-12d3-a456-426614174000</cbc:UUID>
 <cbc:IssueDate>2025-02-16</cbc:IssueDate>
@@ -29,16 +29,16 @@ XML;
 });
 
 test('it generates valid XML with all required fields', function () {
-    $invoice = new BasicInvoiceInformation();
+    $invoice = new BasicInvoiceInformation;
     $invoice->setInvoiceId('INV001')
-            ->setUuid('123e4567-e89b-12d3-a456-426614174000')
-            ->setIssueDate('16-02-2025')
-            ->setPaymentMethod('012')
-            ->setNote('Test invoice')
-            ->setInvoiceCounter(1);
-    
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025')
+        ->setPaymentMethod('012')
+        ->setNote('Test invoice')
+        ->setInvoiceCounter(1);
+
     $xml = $invoice->toXml();
-    
+
     // Test presence of required elements
     expect($xml)->toContain('<cbc:ID>INV001</cbc:ID>')
         ->toContain('<cbc:UUID>123e4567-e89b-12d3-a456-426614174000</cbc:UUID>')
@@ -53,99 +53,99 @@ test('it generates valid XML with all required fields', function () {
 });
 
 test('it defaults to JOD currency', function () {
-    $invoice = new BasicInvoiceInformation();
+    $invoice = new BasicInvoiceInformation;
     $invoice->setInvoiceId('INV001')
-            ->setUuid('123e4567-e89b-12d3-a456-426614174000')
-            ->setIssueDate('16-02-2025');
-    
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025');
+
     $xml = $invoice->toXml();
-    
+
     expect($xml)->toContain('<cbc:DocumentCurrencyCode>JOD</cbc:DocumentCurrencyCode>')
-                ->toContain('<cbc:TaxCurrencyCode>JOD</cbc:TaxCurrencyCode>');
+        ->toContain('<cbc:TaxCurrencyCode>JOD</cbc:TaxCurrencyCode>');
 });
 
 test('it generates valid XML without optional note', function () {
-    $invoice = new BasicInvoiceInformation();
+    $invoice = new BasicInvoiceInformation;
     $invoice->setInvoiceId('INV001')
-            ->setUuid('123e4567-e89b-12d3-a456-426614174000')
-            ->setIssueDate('16-02-2025');
-    
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025');
+
     $xml = $invoice->toXml();
-    
+
     expect($xml)->not->toContain('<cbc:Note>');
 });
 
 test('it throws exception when invoice ID is missing', function () {
-    $invoice = new BasicInvoiceInformation();
+    $invoice = new BasicInvoiceInformation;
     $invoice->setUuid('123e4567-e89b-12d3-a456-426614174000')
-            ->setIssueDate('16-02-2025');
-    
-    expect(fn() => $invoice->toXml())
+        ->setIssueDate('16-02-2025');
+
+    expect(fn () => $invoice->toXml())
         ->toThrow(InvalidArgumentException::class, 'Invoice ID is required');
 });
 
 test('it throws exception when UUID is missing', function () {
-    $invoice = new BasicInvoiceInformation();
+    $invoice = new BasicInvoiceInformation;
     $invoice->setInvoiceId('INV001')
-            ->setIssueDate('16-02-2025');
-    
-    expect(fn() => $invoice->toXml())
+        ->setIssueDate('16-02-2025');
+
+    expect(fn () => $invoice->toXml())
         ->toThrow(InvalidArgumentException::class, 'UUID is required');
 });
 
 test('it throws exception when issue date is missing', function () {
-    $invoice = new BasicInvoiceInformation();
+    $invoice = new BasicInvoiceInformation;
     $invoice->setInvoiceId('INV001')
-            ->setUuid('123e4567-e89b-12d3-a456-426614174000');
-    
-    expect(fn() => $invoice->toXml())
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000');
+
+    expect(fn () => $invoice->toXml())
         ->toThrow(InvalidArgumentException::class, 'Issue date is required');
 });
 
 test('it formats date correctly in XML', function () {
-    $invoice = new BasicInvoiceInformation();
+    $invoice = new BasicInvoiceInformation;
     $invoice->setInvoiceId('INV001')
-            ->setUuid('123e4567-e89b-12d3-a456-426614174000')
-            ->setIssueDate('16-02-2025');
-    
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025');
+
     $xml = $invoice->toXml();
-    
+
     expect($xml)->toContain('<cbc:IssueDate>2025-02-16</cbc:IssueDate>');
 });
 
 test('it properly handles Arabic text in note', function () {
-    $invoice = new BasicInvoiceInformation();
+    $invoice = new BasicInvoiceInformation;
     $invoice->setInvoiceId('INV001')
-            ->setUuid('123e4567-e89b-12d3-a456-426614174000')
-            ->setIssueDate('16-02-2025')
-            ->setNote('ملاحظة على الفاتورة');
-    
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025')
+        ->setNote('ملاحظة على الفاتورة');
+
     $xml = $invoice->toXml();
-    
+
     expect($xml)->toContain('<cbc:Note>ملاحظة على الفاتورة</cbc:Note>');
 });
 
 test('it escapes special characters in XML', function () {
-    $invoice = new BasicInvoiceInformation();
+    $invoice = new BasicInvoiceInformation;
     $invoice->setInvoiceId('INV001')
-            ->setUuid('123e4567-e89b-12d3-a456-426614174000')
-            ->setIssueDate('16-02-2025')
-            ->setNote('Note with special chars: < > & " \'');
-    
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025')
+        ->setNote('Note with special chars: < > & " \'');
+
     $xml = $invoice->toXml();
-    
+
     expect($xml)->toContain('<cbc:Note>Note with special chars: &lt; &gt; &amp; &quot; &apos;</cbc:Note>');
 });
 
 test('it handles DateTime object for issue date', function () {
-    $invoice = new BasicInvoiceInformation();
+    $invoice = new BasicInvoiceInformation;
     $date = new DateTime('2025-02-16');
-    
+
     $invoice->setInvoiceId('INV001')
-            ->setUuid('123e4567-e89b-12d3-a456-426614174000')
-            ->setIssueDate($date);
-    
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate($date);
+
     $xml = $invoice->toXml();
-    
+
     expect($xml)->toContain('<cbc:IssueDate>2025-02-16</cbc:IssueDate>');
 });

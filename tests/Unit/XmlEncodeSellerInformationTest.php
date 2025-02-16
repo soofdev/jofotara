@@ -3,11 +3,11 @@
 use JBadarneh\JoFotara\Sections\SellerInformation;
 
 test('it generates exact XML structure', function () {
-    $seller = new SellerInformation();
+    $seller = new SellerInformation;
     $seller->setTin('12345678')
-           ->setName('Test Company');
+        ->setName('Test Company');
 
-    $expected = <<<XML
+    $expected = <<<'XML'
 <cac:AccountingSupplierParty>
     <cac:Party>
         <cac:PostalAddress>
@@ -31,11 +31,10 @@ XML;
     expect($seller->toXml())->toBe($expected);
 });
 
-
 test('it generates valid seller XML', function () {
-    $seller = new SellerInformation();
+    $seller = new SellerInformation;
     $seller->setTin('12345678')
-           ->setName('Test Company');
+        ->setName('Test Company');
 
     $xml = $seller->toXml();
 
@@ -54,9 +53,9 @@ test('it generates valid seller XML', function () {
 });
 
 test('it properly formats XML with indentation', function () {
-    $seller = new SellerInformation();
+    $seller = new SellerInformation;
     $seller->setTin('12345678')
-           ->setName('Test Company');
+        ->setName('Test Company');
 
     $xml = $seller->toXml();
     $lines = explode("\n", $xml);
@@ -69,9 +68,9 @@ test('it properly formats XML with indentation', function () {
 });
 
 test('it handles special characters in XML', function () {
-    $seller = new SellerInformation();
+    $seller = new SellerInformation;
     $seller->setTin('12345678')
-           ->setName('Company & Trading Co.');
+        ->setName('Company & Trading Co.');
 
     $xml = $seller->toXml();
 
@@ -80,9 +79,9 @@ test('it handles special characters in XML', function () {
 });
 
 test('it handles Arabic text in XML', function () {
-    $seller = new SellerInformation();
+    $seller = new SellerInformation;
     $seller->setTin('12345678')
-           ->setName('شركة الاختبار للتجارة');
+        ->setName('شركة الاختبار للتجارة');
 
     $xml = $seller->toXml();
 

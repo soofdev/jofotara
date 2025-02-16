@@ -10,7 +10,9 @@ class SellerInformation
     use XmlHelperTrait;
 
     private static ?array $defaults = null;
+
     private string $tin;
+
     private string $name;
     // Country code is fixed to JO per documentation
 
@@ -27,10 +29,10 @@ class SellerInformation
      * Configure default values for seller information
      * This is useful when you have the same seller information across multiple invoices
      *
-     * @param string $tin Tax Identification Number
-     * @param string $name Seller's registered name
-     * @param string $countryCode Country code (defaults to 'JO')
-     * @return void
+     * @param  string  $tin  Tax Identification Number
+     * @param  string  $name  Seller's registered name
+     * @param  string  $countryCode  Country code (defaults to 'JO')
+     *
      * @throws InvalidArgumentException If TIN or name is invalid
      */
     public static function configureDefaults(string $tin, string $name): void
@@ -50,8 +52,6 @@ class SellerInformation
 
     /**
      * Clear configured defaults
-     *
-     * @return void
      */
     public static function clearDefaults(): void
     {
@@ -61,8 +61,8 @@ class SellerInformation
     /**
      * Set the seller's Tax Identification Number (TIN)
      *
-     * @param string $tin The seller's TIN
-     * @return self
+     * @param  string  $tin  The seller's TIN
+     *
      * @throws InvalidArgumentException If TIN is invalid
      */
     public function setTin(string $tin): self
@@ -71,14 +71,15 @@ class SellerInformation
             throw new InvalidArgumentException('TIN cannot be empty');
         }
         $this->tin = $tin;
+
         return $this;
     }
 
     /**
      * Set the seller's registered name
      *
-     * @param string $name The seller's name as registered in ISTD
-     * @return self
+     * @param  string  $name  The seller's name as registered in ISTD
+     *
      * @throws InvalidArgumentException If name is invalid
      */
     public function setName(string $name): self
@@ -87,42 +88,41 @@ class SellerInformation
             throw new InvalidArgumentException('Seller name cannot be empty');
         }
         $this->name = $name;
+
         return $this;
     }
-
 
     /**
      * Convert seller information to XML
      *
      * @return string
+     *
      * @throws InvalidArgumentException If required fields are missing
      */
     /**
      * Convert seller information to array
      *
-     * @return array
      * @throws InvalidArgumentException If required fields are missing
      */
     public function toArray(): array
     {
-        if (!isset($this->tin)) {
+        if (! isset($this->tin)) {
             throw new InvalidArgumentException('Seller TIN is required');
         }
-        if (!isset($this->name)) {
+        if (! isset($this->name)) {
             throw new InvalidArgumentException('Seller name is required');
         }
 
         return [
             'tin' => $this->tin,
             'name' => $this->name,
-            'countryCode' => 'JO'
+            'countryCode' => 'JO',
         ];
     }
 
     /**
      * Convert seller information to XML
      *
-     * @return string
      * @throws InvalidArgumentException If required fields are missing
      */
     public function toXml(): string
@@ -130,7 +130,7 @@ class SellerInformation
         $data = $this->toArray();
 
         $xml = [];
-        
+
         $xml[] = '<cac:AccountingSupplierParty>';
         $xml[] = '    <cac:Party>';
         $xml[] = '        <cac:PostalAddress>';

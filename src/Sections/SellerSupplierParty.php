@@ -13,19 +13,19 @@ class SellerSupplierParty
 
     /**
      * Set the seller's sequence of income source (activity)
-     * 
-     * @param string $id The sequence ID
-     * @return self
+     *
+     * @param  string  $id  The sequence ID
      */
     public function setSequenceId(string $id): self
     {
         $this->sequenceId = $id;
+
         return $this;
     }
 
     /**
      * Convert the seller supplier party information to XML
-     * 
+     *
      * @return string The XML representation
      */
     public function toXml(): string
@@ -49,8 +49,6 @@ class SellerSupplierParty
     /**
      * Get the current state as an array
      * This is mainly used for testing purposes
-     * 
-     * @return array
      */
     public function toArray(): array
     {

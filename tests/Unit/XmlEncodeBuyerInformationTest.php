@@ -3,15 +3,15 @@
 use JBadarneh\JoFotara\Sections\BuyerInformation;
 
 test('it generates exact XML structure', function () {
-    $buyer = new BuyerInformation();
+    $buyer = new BuyerInformation;
     $buyer->setId('123456789', 'NIN')
-          ->setPostalCode('11937')
-          ->setCityCode('JO-AM')
-          ->setName('John Doe')
-          ->setPhone('0791234567')
-          ->setTin('987654321');
-    
-    $expected = <<<XML
+        ->setPostalCode('11937')
+        ->setCityCode('JO-AM')
+        ->setName('John Doe')
+        ->setPhone('0791234567')
+        ->setTin('987654321');
+
+    $expected = <<<'XML'
 <cac:AccountingCustomerParty>
     <cac:Party>
         <cac:PartyIdentification>
@@ -44,10 +44,10 @@ XML;
 });
 
 test('it generates valid XML with minimal fields', function () {
-    $buyer = new BuyerInformation();
+    $buyer = new BuyerInformation;
     $buyer->setId('123456789', 'NIN');
-    
-    $expected = <<<XML
+
+    $expected = <<<'XML'
 <cac:AccountingCustomerParty>
     <cac:Party>
         <cac:PartyIdentification>
@@ -61,12 +61,12 @@ XML;
 });
 
 test('it escapes special characters in XML', function () {
-    $buyer = new BuyerInformation();
+    $buyer = new BuyerInformation;
     $buyer->setId('123456789', 'NIN')
-          ->setName('John & Sons Trading LLC')
-          ->setPostalCode('11937 < 12000');
-    
-    $expected = <<<XML
+        ->setName('John & Sons Trading LLC')
+        ->setPostalCode('11937 < 12000');
+
+    $expected = <<<'XML'
 <cac:AccountingCustomerParty>
     <cac:Party>
         <cac:PartyIdentification>
