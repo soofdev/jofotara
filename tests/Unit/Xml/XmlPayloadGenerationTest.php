@@ -45,9 +45,9 @@ test('generates a valid XML payload as per the UBL 2.1 schema', function () {
     $result = $this->validateAgainstUblSchema($xml);
 
     // If validation fails, show the errors
-    if (!$result['isValid']) {
+    if (! $result['isValid']) {
         $errorMessages = $this->formatSchemaErrors($result['errors']);
-        test()->fail("XML validation failed with errors:\n" . $errorMessages);
+        test()->fail("XML validation failed with errors:\n".$errorMessages);
     }
 
     expect($result['isValid'])->toBeTrue();
