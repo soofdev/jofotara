@@ -1,0 +1,74 @@
+<?php
+
+namespace JBadarneh\JoFotara\Sections;
+
+use InvalidArgumentException;
+use JBadarneh\JoFotara\Traits\XmlHelperTrait;
+
+class InvoiceItems
+{
+    use XmlHelperTrait;
+
+    private array $items = [];
+
+    /**
+     * Add a new line item to the invoice
+     * 
+     * @param string $id Unique serial number for this line item
+     * @return InvoiceLineItem
+     */
+    public function addItem(string $id): InvoiceLineItem
+    {
+        if (isset($this->items[$id])) {
+            throw new InvalidArgumentException("Item with ID {$id} already exists");
+        }
+
+        $item = new InvoiceLineItem($id);
+        $this->items[$id] = $item;
+        return $item;
+    }
+
+    /**
+     * Get all line items
+     * 
+     * @return array<string, InvoiceLineItem>
+     */
+    public function getItems(): array
+    {
+        return $this->items;
+    }
+
+    /**
+     * Convert all invoice items to XML
+     * 
+     * @return string The XML representation
+     */
+    public function toXml(): string
+    {
+        if (empty($this->items)) {
+            throw new InvalidArgumentException('At least one invoice item is required');
+        }
+
+        $xml = [];
+        foreach ($this->items as $item) {
+            $xml[] = $item->toXml();
+        }
+
+        return implode("\n", $xml);
+    }
+
+    /**
+     * Get the current state as an array
+     * This is mainly used for testing purposes
+     * 
+     * @return array
+     */
+    public function toArray(): array
+    {
+        $items = [];
+        foreach ($this->items as $id => $item) {
+            $items[$id] = $item->toArray();
+        }
+        return $items;
+    }
+}
