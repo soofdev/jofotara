@@ -8,7 +8,7 @@ use JBadarneh\JoFotara\Sections\BuyerInformation;
 use JBadarneh\JoFotara\Sections\InvoiceItems;
 use JBadarneh\JoFotara\Sections\InvoiceTotals;
 use JBadarneh\JoFotara\Sections\SellerInformation;
-use JBadarneh\JoFotara\Sections\SellerSupplierParty;
+use JBadarneh\JoFotara\Sections\SupplierIncomeSource;
 use RuntimeException;
 
 class JoFotaraService
@@ -21,7 +21,7 @@ class JoFotaraService
 
     private ?BuyerInformation $buyerInfo = null;
 
-    private ?SellerSupplierParty $supplierParty = null;
+    private ?SupplierIncomeSource $supplierIncomeSource = null;
 
     private ?InvoiceItems $items = null;
 
@@ -77,13 +77,13 @@ class JoFotaraService
     /**
      * Get the supplier information section builder
      */
-    public function supplierInformation(): SellerSupplierParty
+    public function supplierIncomeSource(string $sequence): SupplierIncomeSource
     {
-        if (! $this->supplierParty) {
-            $this->supplierParty = new SellerSupplierParty;
+        if (! $this->supplierIncomeSource) {
+            $this->supplierIncomeSource = new SupplierIncomeSource($sequence);
         }
 
-        return $this->supplierParty;
+        return $this->supplierIncomeSource;
     }
 
     /**
@@ -145,6 +145,11 @@ class JoFotaraService
      */
     private function validateSections(): void
     {
+        // Validate supplier income source is set
+        if (! $this->supplierIncomeSource) {
+            throw new InvalidArgumentException('Supplier income source sequence is required');
+        }
+
         // If we have both items and totals, validate they match
         if ($this->items && $this->invoiceTotals) {
             $items = $this->items->getItems();
@@ -211,8 +216,8 @@ class JoFotaraService
         }
 
         // Add Supplier information if set
-        if ($this->supplierParty) {
-            $xml[] = $this->supplierParty->toXml();
+        if ($this->supplierIncomeSource) {
+            $xml[] = $this->supplierIncomeSource->toXml();
         }
 
         // Add invoice totals if set

@@ -24,6 +24,8 @@ test('it encodes invoice XML to base64', function () {
         ->setIssueDate('16-02-2025')
         ->cash();
 
+    $invoice->supplierIncomeSource('123456789');
+
     $invoice->items()
         ->addItem('1')
         ->setQuantity(1)

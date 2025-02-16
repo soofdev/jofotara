@@ -5,11 +5,17 @@ namespace JBadarneh\JoFotara\Sections;
 use InvalidArgumentException;
 use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 
-class SellerSupplierParty
+class SupplierIncomeSource
 {
     use XmlHelperTrait;
 
-    private ?string $sequenceId = null;
+    /**
+     * The seller's sequence of income source (activity)
+     */
+    public function __construct(private string $sequenceId)
+    {
+        $this->sequenceId = $sequenceId;
+    }
 
     /**
      * Set the seller's sequence of income source (activity)

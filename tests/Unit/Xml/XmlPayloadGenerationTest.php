@@ -28,8 +28,7 @@ test('generates a valid XML payload as per the UBL 2.1 schema', function () {
         ->setCityCode('JO-IR');
 
     // 4. Seller Supplier Party
-    $invoice->supplierInformation()
-        ->setSequenceId('1');
+    $invoice->supplierIncomeSource('123456789');
 
     // 5. Invoice Items
     $invoice->items()
@@ -77,8 +76,7 @@ test('generates valid XML for cash invoice with tax exempt item', function () {
         ->setCityCode('JO-IR');
 
     // 4. Seller Supplier Party
-    $invoice->supplierInformation()
-        ->setSequenceId('1');
+    $invoice->supplierIncomeSource('123456789');
 
     // 5. Invoice Items
     $invoice->items()
@@ -143,7 +141,7 @@ test('generates valid XML for cash invoice with tax exempt item', function () {
 <cac:SellerSupplierParty>
     <cac:Party>
         <cac:PartyIdentification>
-            <cbc:ID>1</cbc:ID>
+            <cbc:ID>123456789</cbc:ID>
         </cac:PartyIdentification>
     </cac:Party>
 </cac:SellerSupplierParty>
@@ -201,6 +199,8 @@ test('it throws exception when manually set totals do not match item calculation
         ->setIssueDate('16-02-2025')
         ->cash();
 
+    $invoice->supplierIncomeSource('123456789');
+
     // Add item with tax exclusive amount of 100 and 16% tax
     $invoice->items()
         ->addItem('1')
@@ -233,6 +233,7 @@ test('it auto-calculates invoice totals correctly', function () {
         ->setIssueDate('16-02-2025')
         ->cash();
 
+    $invoice->supplierIncomeSource('123456789');
     // Add item with tax exclusive amount of 100 and 16% tax
     $invoice->items()
         ->addItem('1')
