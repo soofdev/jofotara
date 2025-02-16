@@ -181,8 +181,11 @@ class JoFotaraClass
         // Add XML declaration
         $xml[] = '<?xml version="1.0" encoding="UTF-8"?>';
 
-        // Add root element with namespaces (we'll need to add proper namespaces later)
-        $xml[] = '<Invoice>';
+        // Add root element with namespaces UBL2.1 standard
+        $xml[] = '<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2.1" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">';
+
+        // Add UBLVersionID
+        $xml[] = '<cbc:UBLVersionID>2.1</cbc:UBLVersionID>';
 
         // Add basic information
         $xml[] = $this->basicInfo->toXml();
@@ -202,14 +205,14 @@ class JoFotaraClass
             $xml[] = $this->supplierParty->toXml();
         }
 
-        // Add items if set
-        if ($this->items) {
-            $xml[] = $this->items->toXml();
-        }
-
         // Add invoice totals if set
         if ($this->invoiceTotals) {
             $xml[] = $this->invoiceTotals->toXml();
+        }
+
+        // Add items if set
+        if ($this->items) {
+            $xml[] = $this->items->toXml();
         }
 
         // Close root element
