@@ -1,6 +1,58 @@
 <?php
 
 use JBadarneh\JoFotara\JoFotaraService;
+use JBadarneh\JoFotara\Tests\Helpers\XmlSchemaValidator;
+
+uses(XmlSchemaValidator::class);
+
+test('generates a valid XML payload as per the UBL 2.1 schema', function () {
+    $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
+    
+    // 1. Basic Information
+    $invoice->basicInformation()
+        ->setInvoiceId('INV-001')
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025')
+        ->cash();
+
+    // 2. Seller Information
+    $invoice->sellerInformation()
+        ->setName('Seller Company')
+        ->setTin('123456789');
+
+    // 3. Buyer Information
+    $invoice->buyerInformation()
+        ->setId('987654321', 'TIN')
+        ->setName('Customer 123')
+        ->setPostalCode('11937')
+        ->setCityCode('JO-IR');
+
+    // 4. Seller Supplier Party
+    $invoice->supplierInformation()
+        ->setSequenceId('1');
+
+    // 5. Invoice Items
+    $invoice->items()
+        ->addItem('1')
+        ->setQuantity(2)
+        ->setUnitPrice(10.0)
+        ->setDescription('Test Item')
+        ->taxExempted();
+
+    // 6. Invoice Totals (will be auto-calculated)
+    $invoice->invoiceTotals();
+
+    $xml = $invoice->generateXml();
+    $result = $this->validateAgainstUblSchema($xml);
+
+    // If validation fails, show the errors
+    if (!$result['isValid']) {
+        $errorMessages = $this->formatSchemaErrors($result['errors']);
+        test()->fail("XML validation failed with errors:\n" . $errorMessages);
+    }
+
+    expect($result['isValid'])->toBeTrue();
+});
 
 test('generates valid XML for cash invoice with tax exempt item', function () {
     $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
