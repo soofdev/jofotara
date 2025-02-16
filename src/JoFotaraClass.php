@@ -90,8 +90,41 @@ class JoFotaraClass
      */
     public function generateXml(): string
     {
-        // This will be implemented to combine XML from all sections
-        return '';
+        $xml = [];
+        
+        // Add XML declaration
+        $xml[] = '<?xml version="1.0" encoding="UTF-8"?>';
+        
+        // Add root element with namespaces (we'll need to add proper namespaces later)
+        $xml[] = '<Invoice>';
+        
+        // Add basic information
+        $xml[] = $this->basicInfo->toXml();
+        
+        // Add seller information if set
+        if ($this->sellerInfo) {
+            $xml[] = $this->sellerInfo->toXml();
+        }
+        
+        // Add buyer information if set
+        if ($this->buyerInfo) {
+            $xml[] = $this->buyerInfo->toXml();
+        }
+        
+        // Add items if set
+        if ($this->items) {
+            $xml[] = $this->items->toXml();
+        }
+        
+        // Add monetary totals if set
+        if ($this->monetaryTotals) {
+            $xml[] = $this->monetaryTotals->toXml();
+        }
+        
+        // Close root element
+        $xml[] = '</Invoice>';
+        
+        return implode("\n", $xml);
     }
 
     /**

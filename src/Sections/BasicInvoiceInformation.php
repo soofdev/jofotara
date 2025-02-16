@@ -111,14 +111,62 @@ class BasicInvoiceInformation
     }
 
     /**
-     * Generate XML for this section
+     * Convert the basic invoice information to XML
      *
-     * @return string
+     * @return string The XML representation of the basic invoice information
+     * @throws InvalidArgumentException If required fields are missing
      */
-    public function generateXml(): string
+    /**
+     * Escape special characters for XML
+     *
+     * @param string|null $value The value to escape
+     * @return string|null The escaped value
+     */
+    private function escapeXml(?string $value): ?string
     {
-        // Will be implemented later
-        return '';
+        if ($value === null) {
+            return null;
+        }
+
+        return htmlspecialchars($value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+    }
+
+    public function toXml(): string
+    {
+        if (!isset($this->invoiceId)) {
+            throw new InvalidArgumentException('Invoice ID is required');
+        }
+        if (!isset($this->uuid)) {
+            throw new InvalidArgumentException('UUID is required');
+        }
+        if (!isset($this->issueDate)) {
+            throw new InvalidArgumentException('Issue date is required');
+        }
+
+        $xml = [];
+        
+        // Basic invoice elements
+        $xml[] = sprintf('<cbc:ID>%s</cbc:ID>', $this->escapeXml($this->invoiceId));
+        $xml[] = sprintf('<cbc:UUID>%s</cbc:UUID>', $this->escapeXml($this->uuid));
+        $xml[] = sprintf('<cbc:IssueDate>%s</cbc:IssueDate>', $this->issueDate->format('Y-m-d'));
+        $xml[] = sprintf('<cbc:InvoiceTypeCode name="%s">388</cbc:InvoiceTypeCode>', $this->escapeXml($this->paymentMethod));
+        
+        // Optional note
+        if ($this->note !== null) {
+            $xml[] = sprintf('<cbc:Note>%s</cbc:Note>', $this->escapeXml($this->note));
+        }
+        
+        // Currency codes
+        $xml[] = sprintf('<cbc:DocumentCurrencyCode>%s</cbc:DocumentCurrencyCode>', $this->escapeXml($this->currency));
+        $xml[] = sprintf('<cbc:TaxCurrencyCode>%s</cbc:TaxCurrencyCode>', $this->escapeXml($this->currency));
+        
+        // Invoice counter
+        $xml[] = '<cac:AdditionalDocumentReference>';
+        $xml[] = '    <cbc:ID>ICV</cbc:ID>';
+        $xml[] = sprintf('    <cbc:UUID>%s</cbc:UUID>', $this->escapeXml((string)$this->invoiceCounter));
+        $xml[] = '</cac:AdditionalDocumentReference>';
+        
+        return implode("\n", $xml);
     }
 
     /**
