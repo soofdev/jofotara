@@ -59,7 +59,7 @@ test('it generates exact XML structure for tax exempted item', function () {
         ->setDiscount(0)
         ->setTaxCategory('Z');
 
-    $expected = <<<'XML'
+    $expected = $this->normalizeXml(<<<'XML'
 <cac:InvoiceLine>
     <cbc:ID>2</cbc:ID>
     <cbc:InvoicedQuantity unitCode="PCE">10.00</cbc:InvoicedQuantity>
@@ -90,7 +90,7 @@ test('it generates exact XML structure for tax exempted item', function () {
         </cac:AllowanceCharge>
     </cac:Price>
 </cac:InvoiceLine>
-XML;
+XML);
 
     expect($items->toXml())->toBe($expected);
 });
@@ -204,7 +204,7 @@ test('it generates XML for standard rate item with tax and discount', function (
         ->setDiscount(2.0)
         ->tax(7);
 
-    $expected = <<<'XML'
+    $expected = $this->normalizeXml(<<<'XML'
 <cac:InvoiceLine>
     <cbc:ID>1</cbc:ID>
     <cbc:InvoicedQuantity unitCode="PCE">33.00</cbc:InvoicedQuantity>
@@ -235,7 +235,7 @@ test('it generates XML for standard rate item with tax and discount', function (
         </cac:AllowanceCharge>
     </cac:Price>
 </cac:InvoiceLine>
-XML;
+XML);
 
     expect($items->toXml())->toBe($expected);
 });

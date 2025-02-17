@@ -50,7 +50,7 @@ test('it generates valid XML with minimal fields', function () {
     $buyer = new BuyerInformation;
     $buyer->setId('123456789', 'NIN');
 
-    $expected = <<<'XML'
+    $expected = $this->normalizeXml(<<<'XML'
 <cac:AccountingCustomerParty>
     <cac:Party>
         <cac:PartyIdentification>
@@ -58,7 +58,7 @@ test('it generates valid XML with minimal fields', function () {
         </cac:PartyIdentification>
     </cac:Party>
 </cac:AccountingCustomerParty>
-XML;
+XML);
 
     expect($buyer->toXml())->toBe($expected);
 });
@@ -69,7 +69,7 @@ test('it escapes special characters in XML', function () {
         ->setName('John & Sons Trading LLC')
         ->setPostalCode('11937 < 12000');
 
-    $expected = <<<'XML'
+    $expected = $this->normalizeXml(<<<'XML'
 <cac:AccountingCustomerParty>
     <cac:Party>
         <cac:PartyIdentification>
@@ -86,7 +86,7 @@ test('it escapes special characters in XML', function () {
         </cac:PartyLegalEntity>
     </cac:Party>
 </cac:AccountingCustomerParty>
-XML;
+XML);
 
     expect($buyer->toXml())->toBe($expected);
 });

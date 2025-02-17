@@ -76,7 +76,7 @@ test('it generates XML structure without discount', function () {
         ->setTaxTotalAmount(16)
         ->setPayableAmount(116);
 
-    $expected = <<<'XML'
+    $expected = $this->normalizeXml(<<<'XML'
 <cac:TaxTotal>
     <cbc:TaxAmount currencyID="JOD">16.00</cbc:TaxAmount>
 </cac:TaxTotal>
@@ -85,7 +85,7 @@ test('it generates XML structure without discount', function () {
     <cbc:TaxInclusiveAmount currencyID="JOD">116.00</cbc:TaxInclusiveAmount>
     <cbc:PayableAmount currencyID="JOD">116.00</cbc:PayableAmount>
 </cac:LegalMonetaryTotal>
-XML;
+XML);
 
     expect($totals->toXml())->toBe($expected);
 });
