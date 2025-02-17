@@ -150,6 +150,6 @@ class SellerInformation
         $xml[] = '    </cac:Party>';
         $xml[] = '</cac:AccountingSupplierParty>';
 
-        return implode("\n", $xml);
+        return $this->normalizeXml(implode("\n", $xml));
     }
 }

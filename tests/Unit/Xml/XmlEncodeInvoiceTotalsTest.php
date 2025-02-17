@@ -1,6 +1,9 @@
 <?php
 
 use JBadarneh\JoFotara\Sections\InvoiceTotals;
+use JBadarneh\JoFotara\Traits\XmlHelperTrait;
+
+uses(XmlHelperTrait::class);
 
 test('it requires tax exclusive amount', function () {
     $totals = new InvoiceTotals;
@@ -46,7 +49,7 @@ test('it generates exact XML structure with discount', function () {
         ->setTaxTotalAmount(10)
         ->setPayableAmount(100);
 
-    $expected = <<<'XML'
+    $expected = $this->normalizeXml(<<<'XML'
 <cac:AllowanceCharge>
     <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
     <cbc:AllowanceChargeReason>discount</cbc:AllowanceChargeReason>
@@ -61,7 +64,7 @@ test('it generates exact XML structure with discount', function () {
     <cbc:AllowanceTotalAmount currencyID="JOD">10.00</cbc:AllowanceTotalAmount>
     <cbc:PayableAmount currencyID="JOD">100.00</cbc:PayableAmount>
 </cac:LegalMonetaryTotal>
-XML;
+XML);
 
     expect($totals->toXml())->toBe($expected);
 });

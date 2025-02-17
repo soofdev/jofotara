@@ -1,13 +1,16 @@
 <?php
 
 use JBadarneh\JoFotara\Sections\SellerInformation;
+use JBadarneh\JoFotara\Traits\XmlHelperTrait;
+
+uses(XmlHelperTrait::class);
 
 test('it generates exact XML structure', function () {
     $seller = new SellerInformation;
     $seller->setTin('12345678')
         ->setName('Test Company');
 
-    $expected = <<<'XML'
+    $expected = $this->normalizeXml(<<<'XML'
 <cac:AccountingSupplierParty>
     <cac:Party>
         <cac:PostalAddress>
@@ -26,7 +29,7 @@ test('it generates exact XML structure', function () {
         </cac:PartyLegalEntity>
     </cac:Party>
 </cac:AccountingSupplierParty>
-XML;
+XML);
 
     expect($seller->toXml())->toBe($expected);
 });

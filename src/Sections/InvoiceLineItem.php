@@ -274,7 +274,7 @@ class InvoiceLineItem
         $xml[] = '    </cac:Price>';
         $xml[] = '</cac:InvoiceLine>';
 
-        return implode("\n", $xml);
+        return $this->normalizeXml(implode("\n", $xml));
     }
 
     /**

@@ -1,6 +1,9 @@
 <?php
 
 use JBadarneh\JoFotara\Sections\BuyerInformation;
+use JBadarneh\JoFotara\Traits\XmlHelperTrait;
+
+uses(XmlHelperTrait::class);
 
 test('it generates exact XML structure', function () {
     $buyer = new BuyerInformation;
@@ -11,7 +14,7 @@ test('it generates exact XML structure', function () {
         ->setPhone('0791234567')
         ->setTin('987654321');
 
-    $expected = <<<'XML'
+    $expected = $this->normalizeXml(<<<'XML'
 <cac:AccountingCustomerParty>
     <cac:Party>
         <cac:PartyIdentification>
@@ -38,7 +41,7 @@ test('it generates exact XML structure', function () {
         <cbc:Telephone>0791234567</cbc:Telephone>
     </cac:AccountingContact>
 </cac:AccountingCustomerParty>
-XML;
+XML);
 
     expect($buyer->toXml())->toBe($expected);
 });

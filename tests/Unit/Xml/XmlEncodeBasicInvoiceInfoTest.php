@@ -1,6 +1,9 @@
 <?php
 
 use JBadarneh\JoFotara\Sections\BasicInvoiceInformation;
+use JBadarneh\JoFotara\Traits\XmlHelperTrait;
+
+uses(XmlHelperTrait::class);
 
 test('it generates exact XML structure', function () {
     $invoice = new BasicInvoiceInformation;
@@ -11,7 +14,7 @@ test('it generates exact XML structure', function () {
         ->setNote('Test invoice')
         ->setInvoiceCounter(1);
 
-    $expected = <<<'XML'
+    $expected = $this->normalizeXml(<<<'XML'
 <cbc:ID>INV001</cbc:ID>
 <cbc:UUID>123e4567-e89b-12d3-a456-426614174000</cbc:UUID>
 <cbc:IssueDate>2025-02-16</cbc:IssueDate>
@@ -23,7 +26,7 @@ test('it generates exact XML structure', function () {
     <cbc:ID>ICV</cbc:ID>
     <cbc:UUID>1</cbc:UUID>
 </cac:AdditionalDocumentReference>
-XML;
+XML);
 
     expect($invoice->toXml())->toBe($expected);
 });

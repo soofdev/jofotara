@@ -1,6 +1,9 @@
 <?php
 
 use JBadarneh\JoFotara\Sections\InvoiceItems;
+use JBadarneh\JoFotara\Traits\XmlHelperTrait;
+
+uses(XmlHelperTrait::class);
 
 test('it generates exact XML structure for standard rate item', function () {
     $items = new InvoiceItems;
@@ -11,7 +14,7 @@ test('it generates exact XML structure for standard rate item', function () {
         ->setDiscount(2.0)
         ->setTaxCategory('S', 7);
 
-    $expected = <<<'XML'
+    $expected = $this->normalizeXml(<<<'XML'
 <cac:InvoiceLine>
     <cbc:ID>1</cbc:ID>
     <cbc:InvoicedQuantity unitCode="PCE">33.00</cbc:InvoicedQuantity>
@@ -42,7 +45,7 @@ test('it generates exact XML structure for standard rate item', function () {
         </cac:AllowanceCharge>
     </cac:Price>
 </cac:InvoiceLine>
-XML;
+XML);
 
     expect($items->toXml())->toBe($expected);
 });

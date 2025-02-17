@@ -1,11 +1,14 @@
 <?php
 
 use JBadarneh\JoFotara\Sections\SupplierIncomeSource;
+use JBadarneh\JoFotara\Traits\XmlHelperTrait;
+
+uses(XmlHelperTrait::class);
 
 test('it generates exact XML structure', function () {
     $supplier = new SupplierIncomeSource('9932895');
 
-    $expected = <<<'XML'
+    $expected = $this->normalizeXml(<<<'XML'
 <cac:SellerSupplierParty>
     <cac:Party>
         <cac:PartyIdentification>
@@ -13,7 +16,7 @@ test('it generates exact XML structure', function () {
         </cac:PartyIdentification>
     </cac:Party>
 </cac:SellerSupplierParty>
-XML;
+XML);
 
     expect($supplier->toXml())->toBe($expected);
 });

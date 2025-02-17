@@ -180,7 +180,7 @@ class InvoiceTotals
         );
         $xml[] = '</cac:LegalMonetaryTotal>';
 
-        return implode("\n", $xml);
+        return $this->normalizeXml(implode("\n", $xml));
     }
 
     /**

@@ -198,7 +198,7 @@ class BuyerInformation
 
         $xml[] = '</cac:AccountingCustomerParty>';
 
-        return implode("\n", $xml);
+        return $this->normalizeXml(implode("\n", $xml));
     }
 
     /**

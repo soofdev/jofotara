@@ -2,8 +2,9 @@
 
 use JBadarneh\JoFotara\JoFotaraService;
 use JBadarneh\JoFotara\Tests\Helpers\XmlSchemaValidator;
+use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 
-uses(XmlSchemaValidator::class);
+uses(XmlSchemaValidator::class, XmlHelperTrait::class);
 
 test('generates a valid XML payload as per the UBL 2.1 schema', function () {
     $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
@@ -89,7 +90,7 @@ test('generates valid XML for cash invoice with tax exempt item', function () {
     // 6. Invoice Totals (will be auto-calculated)
     $invoice->invoiceTotals();
 
-    $expectedXml = <<<'XML'
+    $expectedXml = $this->normalizeXml(<<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2">
 <cbc:UBLVersionID>2.1</cbc:UBLVersionID>
@@ -184,7 +185,7 @@ test('generates valid XML for cash invoice with tax exempt item', function () {
     </cac:Price>
 </cac:InvoiceLine>
 </Invoice>
-XML;
+XML);
 
     expect($invoice->generateXml())->toBe($expectedXml);
 });

@@ -49,7 +49,7 @@ class SupplierIncomeSource
         $xml[] = '    </cac:Party>';
         $xml[] = '</cac:SellerSupplierParty>';
 
-        return implode("\n", $xml);
+        return $this->normalizeXml(implode("\n", $xml));
     }
 
     /**
