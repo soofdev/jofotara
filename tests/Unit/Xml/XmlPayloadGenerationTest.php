@@ -91,7 +91,7 @@ test('generates valid XML for cash invoice with tax exempt item', function () {
 
     $expectedXml = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
-<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2">
 <cbc:UBLVersionID>2.1</cbc:UBLVersionID>
 <cbc:ID>INV-001</cbc:ID>
 <cbc:UUID>123e4567-e89b-12d3-a456-426614174000</cbc:UUID>
