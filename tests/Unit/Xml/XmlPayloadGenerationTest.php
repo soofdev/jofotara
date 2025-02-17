@@ -42,7 +42,10 @@ test('generates a valid XML payload as per the UBL 2.1 schema', function () {
     // 6. Invoice Totals (will be auto-calculated)
     $invoice->invoiceTotals();
 
-    $xml = $invoice->generateXml();
+    // Generate and normalize XML before validation
+    $xml = $this->normalizeXml($invoice->generateXml());
+    
+    // Validate against schema
     $result = $this->validateAgainstUblSchema($xml);
 
     // If validation fails, show the errors
