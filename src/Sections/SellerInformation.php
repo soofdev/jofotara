@@ -29,8 +29,8 @@ class SellerInformation
      * Configure default values for seller information
      * This is useful when you have the same seller information across multiple invoices
      *
-     * @param string $tin Tax Identification Number
-     * @param string $name Seller's registered name
+     * @param  string  $tin  Tax Identification Number
+     * @param  string  $name  Seller's registered name
      */
     public static function configureDefaults(string $tin, string $name): void
     {
