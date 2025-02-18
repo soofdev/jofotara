@@ -33,6 +33,8 @@ test('it encodes invoice XML to base64', function () {
         ->setDescription('Test Item')
         ->tax(16);
 
+    $invoice->invoiceTotals();
+
     $encodedInvoice = $invoice->encodeInvoice();
 
     $decodedInvoice = base64_decode($encodedInvoice);

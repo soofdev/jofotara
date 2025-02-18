@@ -220,10 +220,8 @@ class JoFotaraService
             $xml[] = $this->supplierIncomeSource->toXml();
         }
 
-        // Add invoice totals if set
-        if ($this->invoiceTotals) {
-            $xml[] = $this->invoiceTotals->toXml();
-        }
+        // Add invoice totals
+        $xml[] = $this->invoiceTotals->toXml();
 
         // Add items if set
         if ($this->items) {

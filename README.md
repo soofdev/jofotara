@@ -57,6 +57,24 @@ Install the package via composer:
 composer require jafar-albadarneh/jofotara
 ```
 
+## Testing the API
+
+**Important Note**: JoFotara does not provide a sandbox environment. To test the integration:
+
+1. You must have a registered entity with the Jordan Tax Department (valid tax ID required)
+2. Your entity needs to be registered for JoFotara (with username/password)
+3. During testing, use past dates for invoice issuance to avoid being taxed for test invoices
+
+### Generate Test Invoice
+
+The package includes an example script to help you generate and test invoices. You can find it at `examples/GenerateGeneralInvoice.php`. This script generates a base64 encoded invoice string that can be used directly in the REST API body.
+
+On macOS, you can copy the generated invoice directly to your clipboard:
+
+```bash
+php examples/GenerateGeneralInvoice.php | pbcopy
+```
+
 ## Detailed Configuration
 
 ### Basic Invoice Information
@@ -209,18 +227,6 @@ $invoice->invoiceTotals()
 
 > **Note**: When manually setting totals, they must match the calculated values from the items, or an exception will be thrown to ensure data integrity.
 
-## Validation
-
-The SDK includes comprehensive validation to ensure your invoice meets JoFotara requirements:
-
-- All required fields are present and properly formatted
-- Date formats follow dd-mm-yyyy pattern
-- Tax calculations are accurate and consistent
-- Totals match line items
-- Valid city codes and tax categories
-
-Validation errors throw `InvalidArgumentException` with descriptive messages to help you quickly identify and fix issues.
-
 ## API Communication
 
 The `send()` method handles the complete flow:
@@ -243,7 +249,19 @@ try {
 }
 ```
 
-## Testing
+## Validation
+
+The SDK includes comprehensive validation to ensure your invoice meets JoFotara requirements:
+
+- All required fields are present and properly formatted
+- Date formats follow dd-mm-yyyy pattern
+- Tax calculations are accurate and consistent
+- Totals match line items
+- Valid city codes and tax categories
+
+Validation errors throw `InvalidArgumentException` with descriptive messages to help you quickly identify and fix issues.
+
+## Development Testing
 
 ```bash
 vendor/bin/pest
