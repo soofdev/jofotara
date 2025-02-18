@@ -5,8 +5,9 @@ namespace JBadarneh\JoFotara\Sections;
 use DateTime;
 use InvalidArgumentException;
 use JBadarneh\JoFotara\Traits\XmlHelperTrait;
+use JBadarneh\JoFotara\Contracts\ValidatableSection;
 
-class BasicInvoiceInformation
+class BasicInvoiceInformation implements ValidatableSection
 {
     use XmlHelperTrait;
 
@@ -97,7 +98,7 @@ class BasicInvoiceInformation
      */
     public function cash(): self
     {
-        $this->paymentMethod = '012';
+        $this->paymentMethod = '011';
 
         return $this;
     }
@@ -107,7 +108,7 @@ class BasicInvoiceInformation
      */
     public function receivable(): self
     {
-        $this->paymentMethod = '022';
+        $this->paymentMethod = '021';
 
         return $this;
     }
@@ -115,7 +116,8 @@ class BasicInvoiceInformation
     /**
      * Set an optional note or description for the invoice
      *
-     * @param  string  $note  The note or description
+     * @param string|null $note The note or description
+     * @return BasicInvoiceInformation
      */
     public function setNote(?string $note): self
     {
@@ -202,5 +204,33 @@ class BasicInvoiceInformation
             'currency' => $this->currency,
             'invoiceCounter' => $this->invoiceCounter,
         ];
+    }
+
+    /**
+     * Validate that all required fields are set and valid
+     * 
+     * @throws InvalidArgumentException If validation fails
+     */
+    public function validateSection(): void
+    {
+        if (!isset($this->invoiceId)) {
+            throw new InvalidArgumentException('Invoice ID is required');
+        }
+        if (!isset($this->uuid)) {
+            throw new InvalidArgumentException('UUID is required');
+        }
+        if (!isset($this->issueDate)) {
+            throw new InvalidArgumentException('Issue date is required');
+        }
+        
+        // Additional validation specific to BasicInvoiceInformation
+        if (empty(trim($this->invoiceId))) {
+            throw new InvalidArgumentException('Invoice ID cannot be empty');
+        }
+        
+        // Validate UUID format
+        if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $this->uuid)) {
+            throw new InvalidArgumentException('Invalid UUID format');
+        }
     }
 }

@@ -4,8 +4,9 @@ namespace JBadarneh\JoFotara\Sections;
 
 use InvalidArgumentException;
 use JBadarneh\JoFotara\Traits\XmlHelperTrait;
+use JBadarneh\JoFotara\Contracts\ValidatableSection;
 
-class InvoiceLineItem
+class InvoiceLineItem implements ValidatableSection
 {
     use XmlHelperTrait;
 
@@ -292,5 +293,52 @@ class InvoiceLineItem
             'taxPercent' => $this->taxPercent,
             'unitCode' => $this->unitCode,
         ];
+    }
+
+    /**
+     * Validate that all required fields are set and valid
+     * 
+     * @throws InvalidArgumentException If validation fails
+     */
+    public function validateSection(): void
+    {
+        // Validate required fields
+        if (!isset($this->quantity)) {
+            throw new InvalidArgumentException('Item quantity is required');
+        }
+        if (!isset($this->unitPrice)) {
+            throw new InvalidArgumentException('Item unit price is required');
+        }
+        if (!isset($this->description)) {
+            throw new InvalidArgumentException('Item description is required');
+        }
+
+        // Validate quantity
+        if ($this->quantity <= 0) {
+            throw new InvalidArgumentException('Item quantity must be greater than 0');
+        }
+
+        // Validate unit price
+        if ($this->unitPrice < 0) {
+            throw new InvalidArgumentException('Item unit price cannot be negative');
+        }
+
+        // Validate discount
+        if ($this->discount < 0) {
+            throw new InvalidArgumentException('Item discount cannot be negative');
+        }
+        if ($this->discount > ($this->quantity * $this->unitPrice)) {
+            throw new InvalidArgumentException('Item discount cannot be greater than total amount');
+        }
+
+        // Validate tax category
+        if (!in_array($this->taxCategory, ['S', 'Z', 'O'])) {
+            throw new InvalidArgumentException('Invalid tax category');
+        }
+
+        // Validate tax percent for standard rate
+        if ($this->taxCategory === 'S' && ($this->taxPercent <= 0 || $this->taxPercent > 16)) {
+            throw new InvalidArgumentException('Tax percentage must be between 0 and 16 for standard rate');
+        }
     }
 }
