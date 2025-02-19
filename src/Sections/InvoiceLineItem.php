@@ -3,8 +3,8 @@
 namespace JBadarneh\JoFotara\Sections;
 
 use InvalidArgumentException;
-use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 use JBadarneh\JoFotara\Contracts\ValidatableSection;
+use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 
 class InvoiceLineItem implements ValidatableSection
 {
@@ -297,19 +297,19 @@ class InvoiceLineItem implements ValidatableSection
 
     /**
      * Validate that all required fields are set and valid
-     * 
+     *
      * @throws InvalidArgumentException If validation fails
      */
     public function validateSection(): void
     {
         // Validate required fields
-        if (!isset($this->quantity)) {
+        if (! isset($this->quantity)) {
             throw new InvalidArgumentException('Item quantity is required');
         }
-        if (!isset($this->unitPrice)) {
+        if (! isset($this->unitPrice)) {
             throw new InvalidArgumentException('Item unit price is required');
         }
-        if (!isset($this->description)) {
+        if (! isset($this->description)) {
             throw new InvalidArgumentException('Item description is required');
         }
 
@@ -332,7 +332,7 @@ class InvoiceLineItem implements ValidatableSection
         }
 
         // Validate tax category
-        if (!in_array($this->taxCategory, ['S', 'Z', 'O'])) {
+        if (! in_array($this->taxCategory, ['S', 'Z', 'O'])) {
             throw new InvalidArgumentException('Invalid tax category');
         }
 

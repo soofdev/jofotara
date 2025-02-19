@@ -3,8 +3,8 @@
 namespace JBadarneh\JoFotara\Sections;
 
 use InvalidArgumentException;
-use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 use JBadarneh\JoFotara\Contracts\ValidatableSection;
+use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 
 class SupplierIncomeSource implements ValidatableSection
 {
@@ -66,12 +66,12 @@ class SupplierIncomeSource implements ValidatableSection
 
     /**
      * Validate that all required fields are set and valid
-     * 
+     *
      * @throws InvalidArgumentException If validation fails
      */
     public function validateSection(): void
     {
-        if (!isset($this->sequenceId)) {
+        if (! isset($this->sequenceId)) {
             throw new InvalidArgumentException('Supplier income source sequence ID is required');
         }
 
@@ -80,7 +80,7 @@ class SupplierIncomeSource implements ValidatableSection
         }
 
         // Validate sequence ID format (assuming numeric)
-        if (!preg_match('/^\d+$/', $this->sequenceId)) {
+        if (! preg_match('/^\d+$/', $this->sequenceId)) {
             throw new InvalidArgumentException('Invalid supplier income source sequence ID format');
         }
     }

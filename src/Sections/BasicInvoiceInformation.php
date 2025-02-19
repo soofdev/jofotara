@@ -4,8 +4,8 @@ namespace JBadarneh\JoFotara\Sections;
 
 use DateTime;
 use InvalidArgumentException;
-use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 use JBadarneh\JoFotara\Contracts\ValidatableSection;
+use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 
 class BasicInvoiceInformation implements ValidatableSection
 {
@@ -116,8 +116,7 @@ class BasicInvoiceInformation implements ValidatableSection
     /**
      * Set an optional note or description for the invoice
      *
-     * @param string|null $note The note or description
-     * @return BasicInvoiceInformation
+     * @param  string|null  $note  The note or description
      */
     public function setNote(?string $note): self
     {
@@ -208,28 +207,28 @@ class BasicInvoiceInformation implements ValidatableSection
 
     /**
      * Validate that all required fields are set and valid
-     * 
+     *
      * @throws InvalidArgumentException If validation fails
      */
     public function validateSection(): void
     {
-        if (!isset($this->invoiceId)) {
+        if (! isset($this->invoiceId)) {
             throw new InvalidArgumentException('Invoice ID is required');
         }
-        if (!isset($this->uuid)) {
+        if (! isset($this->uuid)) {
             throw new InvalidArgumentException('UUID is required');
         }
-        if (!isset($this->issueDate)) {
+        if (! isset($this->issueDate)) {
             throw new InvalidArgumentException('Issue date is required');
         }
-        
+
         // Additional validation specific to BasicInvoiceInformation
         if (empty(trim($this->invoiceId))) {
             throw new InvalidArgumentException('Invoice ID cannot be empty');
         }
-        
+
         // Validate UUID format (8-4-4-4-12)
-        if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $this->uuid)) {
+        if (! preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $this->uuid)) {
             throw new InvalidArgumentException('Invalid UUID format. Must be in format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx');
         }
     }

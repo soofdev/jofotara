@@ -3,8 +3,8 @@
 namespace JBadarneh\JoFotara\Sections;
 
 use InvalidArgumentException;
-use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 use JBadarneh\JoFotara\Contracts\ValidatableSection;
+use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 
 class InvoiceItems implements ValidatableSection
 {
@@ -74,7 +74,7 @@ class InvoiceItems implements ValidatableSection
 
     /**
      * Validate that all required fields are set and valid
-     * 
+     *
      * @throws InvalidArgumentException If validation fails
      */
     public function validateSection(): void

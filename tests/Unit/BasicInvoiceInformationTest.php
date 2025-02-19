@@ -27,26 +27,26 @@ test('it can set basic invoice information', function () {
 test('it validates payment method', function () {
     $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
 
-    expect(fn() => $invoice->basicInformation()->setPaymentMethod('invalid'))
+    expect(fn () => $invoice->basicInformation()->setPaymentMethod('invalid'))
         ->toThrow(InvalidArgumentException::class, 'Payment method must be either [Income Invoice 011 (cash) or 021 (receivable)] or [General Tax Invoice 012 (cash) or 022 (receivable)]')
-        ->and(fn() => $invoice->basicInformation()->setPaymentMethod('022'))->not->toThrow(InvalidArgumentException::class);
+        ->and(fn () => $invoice->basicInformation()->setPaymentMethod('022'))->not->toThrow(InvalidArgumentException::class);
 });
 
 test('it validates date format', function () {
     $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
 
-    expect(fn() => $invoice->basicInformation()->setIssueDate('2025-02-16'))
+    expect(fn () => $invoice->basicInformation()->setIssueDate('2025-02-16'))
         ->toThrow(InvalidArgumentException::class, 'Date must be in the format dd-mm-yyyy')
-        ->and(fn() => $invoice->basicInformation()->setIssueDate('16-02-2025'))->not->toThrow(InvalidArgumentException::class);
+        ->and(fn () => $invoice->basicInformation()->setIssueDate('16-02-2025'))->not->toThrow(InvalidArgumentException::class);
 
 });
 
 test('it validates invoice counter', function () {
     $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
 
-    expect(fn() => $invoice->basicInformation()->setInvoiceCounter(0))
+    expect(fn () => $invoice->basicInformation()->setInvoiceCounter(0))
         ->toThrow(InvalidArgumentException::class, 'Invoice counter must be greater than 0')
-        ->and(fn() => $invoice->basicInformation()->setInvoiceCounter(1))->not->toThrow(InvalidArgumentException::class);
+        ->and(fn () => $invoice->basicInformation()->setInvoiceCounter(1))->not->toThrow(InvalidArgumentException::class);
 
 });
 

@@ -141,19 +141,19 @@ class JoFotaraService
     private function validateSections(): void
     {
         // Validate all required sections are initialized
-        if (!$this->sellerInfo) {
+        if (! $this->sellerInfo) {
             throw new InvalidArgumentException('Seller information is required');
         }
-        if (!$this->buyerInfo) {
+        if (! $this->buyerInfo) {
             throw new InvalidArgumentException('Buyer information is required');
         }
-        if (!$this->supplierIncomeSource) {
+        if (! $this->supplierIncomeSource) {
             throw new InvalidArgumentException('Supplier income source is required');
         }
-        if (!$this->items) {
+        if (! $this->items) {
             throw new InvalidArgumentException('At least one invoice item is required');
         }
-        if (!$this->invoiceTotals) {
+        if (! $this->invoiceTotals) {
             throw new InvalidArgumentException('Invoice totals are required');
         }
 

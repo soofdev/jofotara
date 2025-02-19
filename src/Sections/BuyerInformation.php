@@ -3,8 +3,8 @@
 namespace JBadarneh\JoFotara\Sections;
 
 use InvalidArgumentException;
-use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 use JBadarneh\JoFotara\Contracts\ValidatableSection;
+use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 
 class BuyerInformation implements ValidatableSection
 {
@@ -221,18 +221,18 @@ class BuyerInformation implements ValidatableSection
 
     /**
      * Validate that all required fields are set and valid
-     * 
+     *
      * @throws InvalidArgumentException If validation fails
      */
     public function validateSection(): void
     {
         // Validate required ID and type
-        if (!isset($this->id) || !isset($this->idType)) {
+        if (! isset($this->id) || ! isset($this->idType)) {
             throw new InvalidArgumentException('Buyer ID and type are required');
         }
 
         // Validate ID type
-        if (!in_array($this->idType, ['NIN', 'PN', 'TIN'])) {
+        if (! in_array($this->idType, ['NIN', 'PN', 'TIN'])) {
             throw new InvalidArgumentException('Invalid buyer ID type. Must be NIN, PN, or TIN');
         }
 
@@ -242,12 +242,12 @@ class BuyerInformation implements ValidatableSection
         }
 
         // Validate city code if set
-        if ($this->cityCode !== null && !in_array($this->cityCode, self::VALID_CITY_CODES)) {
+        if ($this->cityCode !== null && ! in_array($this->cityCode, self::VALID_CITY_CODES)) {
             throw new InvalidArgumentException('Invalid city code');
         }
 
         // Validate phone format if set
-        if ($this->phone !== null && !preg_match('/^07[789]\d{7}$/', $this->phone)) {
+        if ($this->phone !== null && ! preg_match('/^07[789]\d{7}$/', $this->phone)) {
             throw new InvalidArgumentException('Invalid phone number format. Must be a valid Jordanian mobile number');
         }
     }
