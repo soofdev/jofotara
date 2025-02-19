@@ -24,6 +24,18 @@ test('it encodes invoice XML to base64', function () {
         ->setIssueDate('16-02-2025')
         ->cash();
 
+    $invoice->sellerInformation()
+        ->setTin('12345678')
+        ->setName('Test Seller');
+
+    // Customer information
+    $invoice->buyerInformation()
+        ->setId('123456789', 'TIN')
+        ->setTin('123456789')
+        ->setName('Test Buyer')
+        ->setCityCode('JO-AM')
+        ->setPhone('0791234567');
+
     $invoice->supplierIncomeSource('123456789');
 
     $invoice->items()

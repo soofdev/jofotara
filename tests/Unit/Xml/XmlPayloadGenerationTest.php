@@ -6,6 +6,160 @@ use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 
 uses(XmlSchemaValidator::class, XmlHelperTrait::class);
 
+// Helper function to set up common invoice sections
+function setupBasicInvoice(): JoFotaraService
+{
+    $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
+
+    $invoice->basicInformation()
+        ->setInvoiceId('INV-001')
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025')
+        ->cash();
+
+    return $invoice;
+}
+
+// Validation Tests
+test('throws exception when seller information is missing', function () {
+    $invoice = setupBasicInvoice();
+
+    // Add all required sections except seller
+    $invoice->buyerInformation()
+        ->setId('987654321', 'TIN')
+        ->setName('Customer 123');
+
+    $invoice->supplierIncomeSource('12345678');
+
+    $invoice->items()
+        ->addItem('1')
+        ->setQuantity(1)
+        ->setUnitPrice(100.0)
+        ->setDescription('Test Item')
+        ->tax(16);
+
+    $invoice->invoiceTotals();
+
+    expect(fn () => $invoice->generateXml())
+        ->toThrow(InvalidArgumentException::class, 'Seller information is required');
+});
+
+test('throws exception when seller information is invalid', function () {
+    $invoice = setupBasicInvoice();
+
+    // Add all other required sections
+    $invoice->buyerInformation()
+        ->setId('987654321', 'TIN')
+        ->setName('Customer 123');
+
+    $invoice->supplierIncomeSource('12345678');
+
+    $invoice->items()
+        ->addItem('1')
+        ->setQuantity(1)
+        ->setUnitPrice(100.0)
+        ->setDescription('Test Item')
+        ->tax(16);
+
+    $invoice->invoiceTotals();
+
+    // Set invalid seller information
+    $invoice->sellerInformation()
+        ->setName('Seller Company')
+        ->setTin('123'); // Should be 8 digits
+
+    expect(fn () => $invoice->generateXml())
+        ->toThrow(InvalidArgumentException::class, 'Invalid TIN format. Must be 8 digits');
+});
+
+test('throws exception when buyer information is invalid', function () {
+    $invoice = setupBasicInvoice();
+
+    // Add all other required sections
+    $invoice->sellerInformation()
+        ->setName('Seller Company')
+        ->setTin('12345678');
+
+    $invoice->supplierIncomeSource('12345678');
+
+    $invoice->items()
+        ->addItem('1')
+        ->setQuantity(1)
+        ->setUnitPrice(100.0)
+        ->setDescription('Test Item')
+        ->tax(16);
+
+    $invoice->invoiceTotals();
+
+    expect(fn () => // Set invalid buyer information
+    $invoice->buyerInformation()
+        ->setId('987654321', 'TIN')
+        ->setCityCode('INVALID'))
+        ->toThrow(InvalidArgumentException::class, 'City code must be one of: JO-BA, JO-MN, JO-MD, JO-MA, JO-KA, JO-JA, JO-IR, JO-AZ, JO-AT, JO-AQ, JO-AM, JO-AJ');
+});
+
+test('throws exception when invoice items are missing', function () {
+    $invoice = setupBasicInvoice();
+
+    // Add all required sections except items
+    $invoice->sellerInformation()
+        ->setName('Seller Company')
+        ->setTin('12345678');
+
+    $invoice->buyerInformation()
+        ->setId('987654321', 'TIN')
+        ->setName('Customer 123');
+
+    $invoice->supplierIncomeSource('12345678');
+
+    $invoice->invoiceTotals();
+
+    expect(fn () => $invoice->generateXml())
+        ->toThrow(InvalidArgumentException::class, 'At least one invoice item is required');
+});
+
+test('it throws exception when manually set totals do not match item calculations', function () {
+    $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
+
+    // Set up basic invoice info
+    $invoice->basicInformation()
+        ->setInvoiceId('INV-001')
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025')
+        ->cash();
+
+    // Add required seller info
+    $invoice->sellerInformation()
+        ->setName('Seller Company')
+        ->setTin('12345678');
+
+    // Add required buyer info
+    $invoice->buyerInformation()
+        ->setId('987654321', 'TIN')
+        ->setName('Customer 123');
+
+    $invoice->supplierIncomeSource('12345678');
+
+    // Add item with tax exclusive amount of 100 and 16% tax
+    $invoice->items()
+        ->addItem('1')
+        ->setQuantity(1)
+        ->setUnitPrice(100.0)
+        ->setDescription('Test Item')
+        ->tax(16);
+
+    // Set invalid totals manually
+    $invoice->invoiceTotals()
+        ->setTaxExclusiveAmount(90)  // Should be 100
+        ->setTaxInclusiveAmount(100) // Should be 116
+        ->setTaxTotalAmount(10)      // Should be 16
+        ->setPayableAmount(100);     // Should be 116
+
+    expect(fn () => $invoice->generateXml())
+        ->toThrow(InvalidArgumentException::class, 'Invoice totals do not match calculated values from line items');
+});
+
+// Success Cases
 test('generates a valid XML payload as per the UBL 2.1 schema', function () {
     $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
 
@@ -19,7 +173,7 @@ test('generates a valid XML payload as per the UBL 2.1 schema', function () {
     // 2. Seller Information
     $invoice->sellerInformation()
         ->setName('Seller Company')
-        ->setTin('123456789');
+        ->setTin('12345678');
 
     // 3. Buyer Information
     $invoice->buyerInformation()
@@ -70,7 +224,7 @@ test('generates valid XML for cash invoice with tax exempt item', function () {
     // 2. Seller Information
     $invoice->sellerInformation()
         ->setName('Seller Company')
-        ->setTin('123456789');
+        ->setTin('12345678');
 
     // 3. Buyer Information
     $invoice->buyerInformation()
@@ -100,7 +254,7 @@ test('generates valid XML for cash invoice with tax exempt item', function () {
 <cbc:ID>INV-001</cbc:ID>
 <cbc:UUID>123e4567-e89b-12d3-a456-426614174000</cbc:UUID>
 <cbc:IssueDate>2025-02-16</cbc:IssueDate>
-<cbc:InvoiceTypeCode name="012">388</cbc:InvoiceTypeCode>
+<cbc:InvoiceTypeCode name="011">388</cbc:InvoiceTypeCode>
 <cbc:DocumentCurrencyCode>JOD</cbc:DocumentCurrencyCode>
 <cbc:TaxCurrencyCode>JOD</cbc:TaxCurrencyCode>
 <cac:AdditionalDocumentReference>
@@ -115,7 +269,7 @@ test('generates valid XML for cash invoice with tax exempt item', function () {
             </cac:Country>
         </cac:PostalAddress>
         <cac:PartyTaxScheme>
-            <cbc:CompanyID>123456789</cbc:CompanyID>
+            <cbc:CompanyID>12345678</cbc:CompanyID>
             <cac:TaxScheme>
                 <cbc:ID>VAT</cbc:ID>
             </cac:TaxScheme>
@@ -193,40 +347,6 @@ XML);
     expect($invoice->generateXml())->toBe($expectedXml);
 });
 
-test('it throws exception when manually set totals do not match item calculations', function () {
-    $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
-
-    // Set up basic invoice info
-    $invoice->basicInformation()
-        ->setInvoiceId('INV-001')
-        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
-        ->setIssueDate('16-02-2025')
-        ->cash();
-
-    $invoice->supplierIncomeSource('123456789');
-
-    // Add item with tax exclusive amount of 100 and 16% tax
-    $invoice->items()
-        ->addItem('1')
-        ->setQuantity(1)
-        ->setUnitPrice(100.0)
-        ->setDescription('Test Item')
-        ->tax(16);
-
-    // Set invalid totals manually
-    $invoice->invoiceTotals()
-        ->setTaxExclusiveAmount(90)  // Should be 100
-        ->setTaxInclusiveAmount(100) // Should be 116
-        ->setTaxTotalAmount(10)      // Should be 16
-        ->setPayableAmount(100);     // Should be 116
-
-    // generateXml should throw an exception due to invalid totals
-    expect(fn () => $invoice->generateXml())->toThrow(
-        InvalidArgumentException::class,
-        'Invoice totals do not match calculated values from line items'
-    );
-});
-
 test('it auto-calculates invoice totals correctly', function () {
     $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
 
@@ -236,6 +356,16 @@ test('it auto-calculates invoice totals correctly', function () {
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
         ->setIssueDate('16-02-2025')
         ->cash();
+
+    // Add required seller info
+    $invoice->sellerInformation()
+        ->setName('Seller Company')
+        ->setTin('12345678');
+
+    // Add required buyer info
+    $invoice->buyerInformation()
+        ->setId('987654321', 'TIN')
+        ->setName('Customer 123');
 
     $invoice->supplierIncomeSource('123456789');
     // Add item with tax exclusive amount of 100 and 16% tax

@@ -85,8 +85,8 @@ class BasicInvoiceInformation implements ValidatableSection
      */
     public function setPaymentMethod(string $method): self
     {
-        if (! in_array($method, ['012', '022'])) {
-            throw new InvalidArgumentException('Payment method must be either 012 (cash) or 022 (receivable)');
+        if (! in_array($method, ['011', '021', '012', '022'])) {
+            throw new InvalidArgumentException('Payment method must be either [Income Invoice 011 (cash) or 021 (receivable)] or [General Tax Invoice 012 (cash) or 022 (receivable)]');
         }
         $this->paymentMethod = $method;
 
@@ -228,9 +228,9 @@ class BasicInvoiceInformation implements ValidatableSection
             throw new InvalidArgumentException('Invoice ID cannot be empty');
         }
         
-        // Validate UUID format
-        if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $this->uuid)) {
-            throw new InvalidArgumentException('Invalid UUID format');
+        // Validate UUID format (8-4-4-4-12)
+        if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $this->uuid)) {
+            throw new InvalidArgumentException('Invalid UUID format. Must be in format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx');
         }
     }
 }
