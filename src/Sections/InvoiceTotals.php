@@ -3,9 +3,10 @@
 namespace JBadarneh\JoFotara\Sections;
 
 use InvalidArgumentException;
+use JBadarneh\JoFotara\Contracts\ValidatableSection;
 use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 
-class InvoiceTotals
+class InvoiceTotals implements ValidatableSection
 {
     use XmlHelperTrait;
 
@@ -196,5 +197,31 @@ class InvoiceTotals
             'taxTotalAmount' => $this->taxTotalAmount,
             'payableAmount' => $this->payableAmount,
         ];
+    }
+
+    /**
+     * Validate that all required fields are set and valid
+     *
+     * @throws InvalidArgumentException If validation fails
+     */
+    public function validateSection(): void
+    {
+        if ($this->taxInclusiveAmount === 0.0) {
+            throw new InvalidArgumentException('Tax inclusive amount is required');
+        }
+        if ($this->taxExclusiveAmount === 0.0) {
+            throw new InvalidArgumentException('Tax exclusive amount is required');
+        }
+        if ($this->payableAmount === 0.0) {
+            throw new InvalidArgumentException('Payable amount is required');
+        }
+
+        // Validate relationships between amounts
+        if ($this->taxInclusiveAmount < $this->taxExclusiveAmount) {
+            throw new InvalidArgumentException('Tax inclusive amount cannot be less than tax exclusive amount');
+        }
+        if ($this->payableAmount < ($this->taxInclusiveAmount - $this->discountTotalAmount)) {
+            throw new InvalidArgumentException('Payable amount cannot be less than tax inclusive amount minus allowances');
+        }
     }
 }

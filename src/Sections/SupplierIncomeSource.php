@@ -3,9 +3,10 @@
 namespace JBadarneh\JoFotara\Sections;
 
 use InvalidArgumentException;
+use JBadarneh\JoFotara\Contracts\ValidatableSection;
 use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 
-class SupplierIncomeSource
+class SupplierIncomeSource implements ValidatableSection
 {
     use XmlHelperTrait;
 
@@ -61,5 +62,26 @@ class SupplierIncomeSource
         return [
             'sequenceId' => $this->sequenceId,
         ];
+    }
+
+    /**
+     * Validate that all required fields are set and valid
+     *
+     * @throws InvalidArgumentException If validation fails
+     */
+    public function validateSection(): void
+    {
+        if (! isset($this->sequenceId)) {
+            throw new InvalidArgumentException('Supplier income source sequence ID is required');
+        }
+
+        if (empty(trim($this->sequenceId))) {
+            throw new InvalidArgumentException('Supplier income source sequence ID cannot be empty');
+        }
+
+        // Validate sequence ID format (assuming numeric)
+        if (! preg_match('/^\d+$/', $this->sequenceId)) {
+            throw new InvalidArgumentException('Invalid supplier income source sequence ID format');
+        }
     }
 }

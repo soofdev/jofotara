@@ -4,9 +4,10 @@ namespace JBadarneh\JoFotara\Sections;
 
 use DateTime;
 use InvalidArgumentException;
+use JBadarneh\JoFotara\Contracts\ValidatableSection;
 use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 
-class BasicInvoiceInformation
+class BasicInvoiceInformation implements ValidatableSection
 {
     use XmlHelperTrait;
 
@@ -84,8 +85,8 @@ class BasicInvoiceInformation
      */
     public function setPaymentMethod(string $method): self
     {
-        if (! in_array($method, ['012', '022'])) {
-            throw new InvalidArgumentException('Payment method must be either 012 (cash) or 022 (receivable)');
+        if (! in_array($method, ['011', '021', '012', '022'])) {
+            throw new InvalidArgumentException('Payment method must be either [Income Invoice 011 (cash) or 021 (receivable)] or [General Tax Invoice 012 (cash) or 022 (receivable)]');
         }
         $this->paymentMethod = $method;
 
@@ -97,7 +98,7 @@ class BasicInvoiceInformation
      */
     public function cash(): self
     {
-        $this->paymentMethod = '012';
+        $this->paymentMethod = '011';
 
         return $this;
     }
@@ -107,7 +108,7 @@ class BasicInvoiceInformation
      */
     public function receivable(): self
     {
-        $this->paymentMethod = '022';
+        $this->paymentMethod = '021';
 
         return $this;
     }
@@ -115,7 +116,7 @@ class BasicInvoiceInformation
     /**
      * Set an optional note or description for the invoice
      *
-     * @param  string  $note  The note or description
+     * @param  string|null  $note  The note or description
      */
     public function setNote(?string $note): self
     {
@@ -202,5 +203,33 @@ class BasicInvoiceInformation
             'currency' => $this->currency,
             'invoiceCounter' => $this->invoiceCounter,
         ];
+    }
+
+    /**
+     * Validate that all required fields are set and valid
+     *
+     * @throws InvalidArgumentException If validation fails
+     */
+    public function validateSection(): void
+    {
+        if (! isset($this->invoiceId)) {
+            throw new InvalidArgumentException('Invoice ID is required');
+        }
+        if (! isset($this->uuid)) {
+            throw new InvalidArgumentException('UUID is required');
+        }
+        if (! isset($this->issueDate)) {
+            throw new InvalidArgumentException('Issue date is required');
+        }
+
+        // Additional validation specific to BasicInvoiceInformation
+        if (empty(trim($this->invoiceId))) {
+            throw new InvalidArgumentException('Invoice ID cannot be empty');
+        }
+
+        // Validate UUID format (8-4-4-4-12)
+        if (! preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $this->uuid)) {
+            throw new InvalidArgumentException('Invalid UUID format. Must be in format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx');
+        }
     }
 }

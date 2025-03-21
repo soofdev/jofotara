@@ -19,6 +19,7 @@ $invoice->sellerInformation()
 
 // Customer information
 $invoice->buyerInformation()
+    ->setId('32165498', 'TIN')
     ->setTin('32165498')
     ->setName('الزبون التجريبي')
     ->setCityCode('JO-IR')

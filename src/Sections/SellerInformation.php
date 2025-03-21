@@ -3,9 +3,10 @@
 namespace JBadarneh\JoFotara\Sections;
 
 use InvalidArgumentException;
+use JBadarneh\JoFotara\Contracts\ValidatableSection;
 use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 
-class SellerInformation
+class SellerInformation implements ValidatableSection
 {
     use XmlHelperTrait;
 
@@ -148,5 +149,30 @@ class SellerInformation
         $xml[] = '</cac:AccountingSupplierParty>';
 
         return $this->normalizeXml(implode("\n", $xml));
+    }
+
+    /**
+     * Validate that all required fields are set and valid
+     *
+     * @throws InvalidArgumentException If validation fails
+     */
+    public function validateSection(): void
+    {
+        if (! isset($this->tin)) {
+            throw new InvalidArgumentException('Seller TIN is required');
+        }
+        if (! isset($this->name)) {
+            throw new InvalidArgumentException('Seller name is required');
+        }
+
+        // Validate TIN format (assuming 8 digits for Jordan)
+        if (! preg_match('/^\d{8}$/', $this->tin)) {
+            throw new InvalidArgumentException('Invalid TIN format. Must be 8 digits');
+        }
+
+        // Validate name is not empty
+        if (empty(trim($this->name))) {
+            throw new InvalidArgumentException('Seller name cannot be empty');
+        }
     }
 }

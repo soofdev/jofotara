@@ -3,9 +3,10 @@
 namespace JBadarneh\JoFotara\Sections;
 
 use InvalidArgumentException;
+use JBadarneh\JoFotara\Contracts\ValidatableSection;
 use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 
-class InvoiceItems
+class InvoiceItems implements ValidatableSection
 {
     use XmlHelperTrait;
 
@@ -69,5 +70,22 @@ class InvoiceItems
         }
 
         return $items;
+    }
+
+    /**
+     * Validate that all required fields are set and valid
+     *
+     * @throws InvalidArgumentException If validation fails
+     */
+    public function validateSection(): void
+    {
+        if (empty($this->items)) {
+            throw new InvalidArgumentException('At least one invoice item is required');
+        }
+
+        // Validate each item
+        foreach ($this->items as $item) {
+            $item->validateSection();
+        }
     }
 }

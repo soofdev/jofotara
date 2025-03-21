@@ -134,23 +134,38 @@ class JoFotaraService
     }
 
     /**
-     * Generate the complete XML for the invoice
+     * Validate that all sections are consistent and complete
      *
-     * @return string The generated XML
-     */
-    /**
-     * Validate that all sections are consistent
-     *
-     * @throws InvalidArgumentException If there are inconsistencies between sections
+     * @throws InvalidArgumentException If there are inconsistencies or missing sections
      */
     private function validateSections(): void
     {
-        // Validate supplier income source is set
+        // Validate all required sections are initialized
+        if (! $this->sellerInfo) {
+            throw new InvalidArgumentException('Seller information is required');
+        }
+        if (! $this->buyerInfo) {
+            throw new InvalidArgumentException('Buyer information is required');
+        }
         if (! $this->supplierIncomeSource) {
-            throw new InvalidArgumentException('Supplier income source sequence is required');
+            throw new InvalidArgumentException('Supplier income source is required');
+        }
+        if (! $this->items) {
+            throw new InvalidArgumentException('At least one invoice item is required');
+        }
+        if (! $this->invoiceTotals) {
+            throw new InvalidArgumentException('Invoice totals are required');
         }
 
-        // If we have both items and totals, validate they match
+        // Validate each section individually
+        $this->basicInfo->validateSection();
+        $this->sellerInfo->validateSection();
+        $this->buyerInfo->validateSection();
+        $this->supplierIncomeSource->validateSection();
+        $this->items->validateSection();
+        $this->invoiceTotals->validateSection();
+
+        // Cross-section validation (totals matching items)
         if ($this->items && $this->invoiceTotals) {
             $items = $this->items->getItems();
             if (count($items) > 0) {
