@@ -144,7 +144,7 @@ class JoFotaraService
         if (! $this->sellerInfo) {
             throw new InvalidArgumentException('Seller information is required');
         }
-    
+
         if (! $this->supplierIncomeSource) {
             throw new InvalidArgumentException('Supplier income source is required');
         }
