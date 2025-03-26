@@ -75,15 +75,15 @@ test('it validates invoice type', function () {
 
 test('it sets correct payment method code based on invoice type for cash', function () {
     $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
-    
+
     // Income invoice with cash payment
     $invoice->basicInformation()->setInvoiceType('income')->cash();
     expect($invoice->basicInformation()->toArray()['paymentMethod'])->toBe('011');
-    
+
     // General sales invoice with cash payment
     $invoice->basicInformation()->setInvoiceType('general_sales')->cash();
     expect($invoice->basicInformation()->toArray()['paymentMethod'])->toBe('012');
-    
+
     // Special sales invoice with cash payment
     $invoice->basicInformation()->setInvoiceType('special_sales')->cash();
     expect($invoice->basicInformation()->toArray()['paymentMethod'])->toBe('013');
@@ -91,15 +91,15 @@ test('it sets correct payment method code based on invoice type for cash', funct
 
 test('it sets correct payment method code based on invoice type for receivable', function () {
     $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
-    
+
     // Income invoice with receivable payment
     $invoice->basicInformation()->setInvoiceType('income')->receivable();
     expect($invoice->basicInformation()->toArray()['paymentMethod'])->toBe('021');
-    
+
     // General sales invoice with receivable payment
     $invoice->basicInformation()->setInvoiceType('general_sales')->receivable();
     expect($invoice->basicInformation()->toArray()['paymentMethod'])->toBe('022');
-    
+
     // Special sales invoice with receivable payment
     $invoice->basicInformation()->setInvoiceType('special_sales')->receivable();
     expect($invoice->basicInformation()->toArray()['paymentMethod'])->toBe('023');
@@ -110,26 +110,26 @@ test('it throws exception when invoice type is not set', function () {
     $invoice->basicInformation()->setInvoiceId('INV001')
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
         ->setIssueDate('16-02-2025');
-    
+
     expect(fn () => $invoice->basicInformation()->validateSection())
         ->toThrow(InvalidArgumentException::class, 'Invoice type is required. Use setInvoiceType() to set it.');
 });
 
 test('it requires invoice type to be set before setting payment methods', function () {
     $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
-    
+
     // Cash payment without setting invoice type should throw exception
     expect(fn () => $invoice->basicInformation()->cash())
         ->toThrow(InvalidArgumentException::class, 'Invoice type must be set before setting payment method. Use setInvoiceType() first.');
-    
+
     // Receivable payment without setting invoice type should throw exception
     expect(fn () => $invoice->basicInformation()->receivable())
         ->toThrow(InvalidArgumentException::class, 'Invoice type must be set before setting payment method. Use setInvoiceType() first.');
-    
+
     // Direct payment method setting without invoice type should throw exception
     expect(fn () => $invoice->basicInformation()->setPaymentMethod('011'))
         ->toThrow(InvalidArgumentException::class, 'Invoice type must be set before setting payment method. Use setInvoiceType() first.');
-    
+
     // Should work when invoice type is set first
     expect(fn () => $invoice->basicInformation()->setInvoiceType('income')->cash())
         ->not->toThrow(InvalidArgumentException::class);
