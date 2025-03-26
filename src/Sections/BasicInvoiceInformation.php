@@ -30,7 +30,7 @@ class BasicInvoiceInformation implements ValidatableSection
 
     private DateTime $issueDate;
 
-    private string $paymentMethod = '011'; // Default to income invoice cash payment
+    private string $paymentMethod;
     
     private ?string $invoiceType = null;
 
@@ -116,26 +116,26 @@ class BasicInvoiceInformation implements ValidatableSection
      *
      * @param  string  $method  The payment method code
      *
-     * @throws InvalidArgumentException If the payment method is invalid
+     * @throws InvalidArgumentException If the payment method is invalid or if invoice type is not set
      */
     public function setPaymentMethod(string $method): self
     {
+        if ($this->invoiceType === null) {
+            throw new InvalidArgumentException('Invoice type must be set before setting payment method. Use setInvoiceType() first.');
+        }
+        
         $validMethods = ['011', '021', '012', '022', '013', '023'];
         if (! in_array($method, $validMethods)) {
             throw new InvalidArgumentException('Payment method must be one of: 011, 021 (Income), 012, 022 (General Sales), 013, 023 (Special Sales)');
         }
-        $this->paymentMethod = $method;
         
-        // For backward compatibility, infer invoice type from payment method if not set
-        if ($this->invoiceType === null) {
-            if (in_array($method, ['011', '021'])) {
-                $this->invoiceType = 'income';
-            } elseif (in_array($method, ['012', '022'])) {
-                $this->invoiceType = 'general_sales';
-            } elseif (in_array($method, ['013', '023'])) {
-                $this->invoiceType = 'special_sales';
-            }
+        // Validate that the payment method is valid for the current invoice type
+        $validMethodsForType = array_values(self::INVOICE_TYPES[$this->invoiceType]);
+        if (! in_array($method, $validMethodsForType)) {
+            throw new InvalidArgumentException("Payment method '$method' is not valid for invoice type '{$this->invoiceType}'");
         }
+        
+        $this->paymentMethod = $method;
 
         return $this;
     }
@@ -147,14 +147,13 @@ class BasicInvoiceInformation implements ValidatableSection
      * - Income Invoice: 011
      * - General Sales Invoice: 012
      * - Special Sales Invoice: 013
-     * 
-     * If invoice type is not set, defaults to 'income' (011)
+     *
+     * @throws InvalidArgumentException If invoice type is not set
      */
     public function cash(): self
     {
-        // For backward compatibility, default to income if type not set
         if ($this->invoiceType === null) {
-            $this->invoiceType = 'income';
+            throw new InvalidArgumentException('Invoice type must be set before setting payment method. Use setInvoiceType() first.');
         }
         
         $this->paymentMethod = self::INVOICE_TYPES[$this->invoiceType]['cash'];
@@ -169,14 +168,13 @@ class BasicInvoiceInformation implements ValidatableSection
      * - Income Invoice: 021
      * - General Sales Invoice: 022
      * - Special Sales Invoice: 023
-     * 
-     * If invoice type is not set, defaults to 'income' (021)
+     *
+     * @throws InvalidArgumentException If invoice type is not set
      */
     public function receivable(): self
     {
-        // For backward compatibility, default to income if type not set
         if ($this->invoiceType === null) {
-            $this->invoiceType = 'income';
+            throw new InvalidArgumentException('Invoice type must be set before setting payment method. Use setInvoiceType() first.');
         }
         
         $this->paymentMethod = self::INVOICE_TYPES[$this->invoiceType]['receivable'];
@@ -239,6 +237,11 @@ class BasicInvoiceInformation implements ValidatableSection
         $xml[] = sprintf('<cbc:ID>%s</cbc:ID>', $this->escapeXml($this->invoiceId));
         $xml[] = sprintf('<cbc:UUID>%s</cbc:UUID>', $this->escapeXml($this->uuid));
         $xml[] = sprintf('<cbc:IssueDate>%s</cbc:IssueDate>', $this->issueDate->format('Y-m-d'));
+        
+        // Check if invoice type and payment method are set
+        if (!isset($this->paymentMethod)) {
+            throw new InvalidArgumentException('Payment method is required. Use cash(), receivable(), or setPaymentMethod() to set it.');
+        }
         $xml[] = sprintf('<cbc:InvoiceTypeCode name="%s">388</cbc:InvoiceTypeCode>', $this->escapeXml($this->paymentMethod));
 
         // Optional note
@@ -270,7 +273,7 @@ class BasicInvoiceInformation implements ValidatableSection
             'uuid' => $this->uuid ?? null,
             'issueDate' => isset($this->issueDate) ? $this->issueDate->format('d-m-Y') : null,
             'invoiceType' => $this->invoiceType,
-            'paymentMethod' => $this->paymentMethod,
+            'paymentMethod' => $this->paymentMethod ?? null,
             'note' => $this->note,
             'currency' => $this->currency,
             'invoiceCounter' => $this->invoiceCounter,
@@ -287,11 +290,21 @@ class BasicInvoiceInformation implements ValidatableSection
         if (! isset($this->invoiceId)) {
             throw new InvalidArgumentException('Invoice ID is required');
         }
+
         if (! isset($this->uuid)) {
             throw new InvalidArgumentException('UUID is required');
         }
+
         if (! isset($this->issueDate)) {
             throw new InvalidArgumentException('Issue date is required');
+        }
+
+        if (! isset($this->invoiceType)) {
+            throw new InvalidArgumentException('Invoice type is required. Use setInvoiceType() to set it.');
+        }
+
+        if (! isset($this->paymentMethod)) {
+            throw new InvalidArgumentException('Payment method is required. Use cash(), receivable(), or setPaymentMethod() to set it.');
         }
 
         // Additional validation specific to BasicInvoiceInformation

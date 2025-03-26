@@ -22,6 +22,7 @@ test('it encodes invoice XML to base64', function () {
         ->setInvoiceId('INV-001')
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
         ->setIssueDate('16-02-2025')
+        ->setInvoiceType('income')
         ->cash();
 
     $invoice->sellerInformation()

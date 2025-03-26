@@ -9,6 +9,7 @@ test('it can set basic invoice information', function () {
         ->setInvoiceId('INV001')
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
         ->setIssueDate('16-02-2025')
+        ->setInvoiceType('general_sales')
         ->setPaymentMethod('012')
         ->setNote('Test invoice')
         ->setInvoiceCounter(1);
@@ -26,6 +27,9 @@ test('it can set basic invoice information', function () {
 
 test('it validates payment method', function () {
     $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
+
+    // First set invoice type
+    $invoice->basicInformation()->setInvoiceType('general_sales');
 
     expect(fn () => $invoice->basicInformation()->setPaymentMethod('invalid'))
         ->toThrow(InvalidArgumentException::class, 'Payment method must be one of: 011, 021 (Income), 012, 022 (General Sales), 013, 023 (Special Sales)')
@@ -101,19 +105,32 @@ test('it sets correct payment method code based on invoice type for receivable',
     expect($invoice->basicInformation()->toArray()['paymentMethod'])->toBe('023');
 });
 
-test('it defaults to income invoice type when not explicitly set', function () {
+test('it throws exception when invoice type is not set', function () {
+    $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
+    $invoice->basicInformation()->setInvoiceId('INV001')
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025');
+    
+    expect(fn () => $invoice->basicInformation()->validateSection())
+        ->toThrow(InvalidArgumentException::class, 'Invoice type is required. Use setInvoiceType() to set it.');
+});
+
+test('it requires invoice type to be set before setting payment methods', function () {
     $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
     
-    // Cash payment without setting invoice type
-    $invoice->basicInformation()->cash();
-    $data = $invoice->basicInformation()->toArray();
-    expect($data['invoiceType'])->toBe('income')
-        ->and($data['paymentMethod'])->toBe('011');
+    // Cash payment without setting invoice type should throw exception
+    expect(fn () => $invoice->basicInformation()->cash())
+        ->toThrow(InvalidArgumentException::class, 'Invoice type must be set before setting payment method. Use setInvoiceType() first.');
     
-    // New instance for receivable test
-    $invoice2 = new JoFotaraService('test-client-id', 'test-client-secret');
-    $invoice2->basicInformation()->receivable();
-    $data2 = $invoice2->basicInformation()->toArray();
-    expect($data2['invoiceType'])->toBe('income')
-        ->and($data2['paymentMethod'])->toBe('021');
+    // Receivable payment without setting invoice type should throw exception
+    expect(fn () => $invoice->basicInformation()->receivable())
+        ->toThrow(InvalidArgumentException::class, 'Invoice type must be set before setting payment method. Use setInvoiceType() first.');
+    
+    // Direct payment method setting without invoice type should throw exception
+    expect(fn () => $invoice->basicInformation()->setPaymentMethod('011'))
+        ->toThrow(InvalidArgumentException::class, 'Invoice type must be set before setting payment method. Use setInvoiceType() first.');
+    
+    // Should work when invoice type is set first
+    expect(fn () => $invoice->basicInformation()->setInvoiceType('income')->cash())
+        ->not->toThrow(InvalidArgumentException::class);
 });
