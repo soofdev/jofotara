@@ -250,7 +250,7 @@ test('it throws exception when invoice type is not set', function () {
     $invoice->setInvoiceId('INV001')
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
         ->setIssueDate('16-02-2025');
-    
+
     expect(fn () => $invoice->cash())
         ->toThrow(InvalidArgumentException::class, 'Invoice type must be set before setting payment method. Use setInvoiceType() first.');
 
