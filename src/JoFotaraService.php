@@ -144,9 +144,7 @@ class JoFotaraService
         if (! $this->sellerInfo) {
             throw new InvalidArgumentException('Seller information is required');
         }
-        if (! $this->customerInfo) {
-            throw new InvalidArgumentException('Customer information is required');
-        }
+    
         if (! $this->supplierIncomeSource) {
             throw new InvalidArgumentException('Supplier income source is required');
         }
@@ -160,7 +158,10 @@ class JoFotaraService
         // Validate each section individually
         $this->basicInfo->validateSection();
         $this->sellerInfo->validateSection();
-        $this->customerInfo->validateSection();
+        // Validate customer information if set
+        if ($this->customerInfo) {
+            $this->customerInfo->validateSection();
+        }
         $this->supplierIncomeSource->validateSection();
         $this->items->validateSection();
         $this->invoiceTotals->validateSection();

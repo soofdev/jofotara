@@ -72,7 +72,7 @@ test('throws exception when seller information is invalid', function () {
         ->toThrow(InvalidArgumentException::class, 'Invalid TIN format. Must be 8 digits');
 });
 
-test('throws exception when buyer information is invalid', function () {
+test('throws exception when customer information is invalid', function () {
     $invoice = setupBasicInvoice();
 
     // Add all other required sections
@@ -96,6 +96,30 @@ test('throws exception when buyer information is invalid', function () {
         ->setId('987654321', 'TIN')
         ->setCityCode('INVALID'))
         ->toThrow(InvalidArgumentException::class, 'City code must be one of: JO-BA, JO-MN, JO-MD, JO-MA, JO-KA, JO-JA, JO-IR, JO-AZ, JO-AT, JO-AQ, JO-AM, JO-AJ');
+});
+
+test('it should omit the customer information section if not configured as part of the invoice', function () {
+    $invoice = setupBasicInvoice();
+
+    // Add all other required sections
+    $invoice->sellerInformation()
+        ->setName('Seller Company')
+        ->setTin('12345678');
+
+    $invoice->supplierIncomeSource('12345678');
+
+    $invoice->items()
+        ->addItem('1')
+        ->setQuantity(1)
+        ->setUnitPrice(100.0)
+        ->setDescription('Test Item')
+        ->tax(16);
+
+    $invoice->invoiceTotals();
+
+    $xml = $invoice->generateXml();
+
+    expect($xml)->not()->toContain('cac:AccountingCustomerParty');
 });
 
 test('throws exception when invoice items are missing', function () {
