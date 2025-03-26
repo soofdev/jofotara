@@ -1,13 +1,13 @@
 <?php
 
-use JBadarneh\JoFotara\Sections\BuyerInformation;
+use JBadarneh\JoFotara\Sections\CustomerInformation;
 use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 
 uses(XmlHelperTrait::class);
 
 test('it generates exact XML structure', function () {
-    $buyer = new BuyerInformation;
-    $buyer->setId('123456789', 'NIN')
+    $customer = new CustomerInformation;
+    $customer->setId('123456789', 'NIN')
         ->setPostalCode('11937')
         ->setCityCode('JO-AM')
         ->setName('John Doe')
@@ -43,12 +43,12 @@ test('it generates exact XML structure', function () {
 </cac:AccountingCustomerParty>
 XML);
 
-    expect($buyer->toXml())->toBe($expected);
+    expect($customer->toXml())->toBe($expected);
 });
 
 test('it generates valid XML with minimal fields', function () {
-    $buyer = new BuyerInformation;
-    $buyer->setId('123456789', 'NIN');
+    $customer = new CustomerInformation;
+    $customer->setId('123456789', 'NIN');
 
     $expected = $this->normalizeXml(<<<'XML'
 <cac:AccountingCustomerParty>
@@ -60,12 +60,12 @@ test('it generates valid XML with minimal fields', function () {
 </cac:AccountingCustomerParty>
 XML);
 
-    expect($buyer->toXml())->toBe($expected);
+    expect($customer->toXml())->toBe($expected);
 });
 
 test('it escapes special characters in XML', function () {
-    $buyer = new BuyerInformation;
-    $buyer->setId('123456789', 'NIN')
+    $customer = new CustomerInformation;
+    $customer->setId('123456789', 'NIN')
         ->setName('John & Sons Trading LLC')
         ->setPostalCode('11937 < 12000');
 
@@ -88,5 +88,5 @@ test('it escapes special characters in XML', function () {
 </cac:AccountingCustomerParty>
 XML);
 
-    expect($buyer->toXml())->toBe($expected);
+    expect($customer->toXml())->toBe($expected);
 });

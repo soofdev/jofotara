@@ -4,7 +4,7 @@ namespace JBadarneh\JoFotara;
 
 use InvalidArgumentException;
 use JBadarneh\JoFotara\Sections\BasicInvoiceInformation;
-use JBadarneh\JoFotara\Sections\BuyerInformation;
+use JBadarneh\JoFotara\Sections\CustomerInformation;
 use JBadarneh\JoFotara\Sections\InvoiceItems;
 use JBadarneh\JoFotara\Sections\InvoiceTotals;
 use JBadarneh\JoFotara\Sections\SellerInformation;
@@ -19,7 +19,7 @@ class JoFotaraService
 
     private ?SellerInformation $sellerInfo = null;
 
-    private ?BuyerInformation $buyerInfo = null;
+    private ?CustomerInformation $customerInfo = null;
 
     private ?SupplierIncomeSource $supplierIncomeSource = null;
 
@@ -63,15 +63,15 @@ class JoFotaraService
     }
 
     /**
-     * Get the buyer information section builder
+     * Get the customer information section builder
      */
-    public function buyerInformation(): BuyerInformation
+    public function customerInformation(): CustomerInformation
     {
-        if (! $this->buyerInfo) {
-            $this->buyerInfo = new BuyerInformation;
+        if (! $this->customerInfo) {
+            $this->customerInfo = new CustomerInformation;
         }
 
-        return $this->buyerInfo;
+        return $this->customerInfo;
     }
 
     /**
@@ -144,8 +144,8 @@ class JoFotaraService
         if (! $this->sellerInfo) {
             throw new InvalidArgumentException('Seller information is required');
         }
-        if (! $this->buyerInfo) {
-            throw new InvalidArgumentException('Buyer information is required');
+        if (! $this->customerInfo) {
+            throw new InvalidArgumentException('Customer information is required');
         }
         if (! $this->supplierIncomeSource) {
             throw new InvalidArgumentException('Supplier income source is required');
@@ -160,7 +160,7 @@ class JoFotaraService
         // Validate each section individually
         $this->basicInfo->validateSection();
         $this->sellerInfo->validateSection();
-        $this->buyerInfo->validateSection();
+        $this->customerInfo->validateSection();
         $this->supplierIncomeSource->validateSection();
         $this->items->validateSection();
         $this->invoiceTotals->validateSection();
@@ -225,9 +225,9 @@ class JoFotaraService
             $xml[] = $this->sellerInfo->toXml();
         }
 
-        // Add buyer information if set
-        if ($this->buyerInfo) {
-            $xml[] = $this->buyerInfo->toXml();
+        // Add customer information if set
+        if ($this->customerInfo) {
+            $xml[] = $this->customerInfo->toXml();
         }
 
         // Add Supplier information if set

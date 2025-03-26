@@ -29,7 +29,7 @@ test('it encodes invoice XML to base64', function () {
         ->setName('Test Seller');
 
     // Customer information
-    $invoice->buyerInformation()
+    $invoice->customerInformation()
         ->setId('123456789', 'TIN')
         ->setTin('123456789')
         ->setName('Test Buyer')

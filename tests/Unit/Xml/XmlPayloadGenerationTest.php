@@ -25,7 +25,7 @@ test('throws exception when seller information is missing', function () {
     $invoice = setupBasicInvoice();
 
     // Add all required sections except seller
-    $invoice->buyerInformation()
+    $invoice->customerInformation()
         ->setId('987654321', 'TIN')
         ->setName('Customer 123');
 
@@ -48,7 +48,7 @@ test('throws exception when seller information is invalid', function () {
     $invoice = setupBasicInvoice();
 
     // Add all other required sections
-    $invoice->buyerInformation()
+    $invoice->customerInformation()
         ->setId('987654321', 'TIN')
         ->setName('Customer 123');
 
@@ -92,7 +92,7 @@ test('throws exception when buyer information is invalid', function () {
     $invoice->invoiceTotals();
 
     expect(fn () => // Set invalid buyer information
-    $invoice->buyerInformation()
+    $invoice->customerInformation()
         ->setId('987654321', 'TIN')
         ->setCityCode('INVALID'))
         ->toThrow(InvalidArgumentException::class, 'City code must be one of: JO-BA, JO-MN, JO-MD, JO-MA, JO-KA, JO-JA, JO-IR, JO-AZ, JO-AT, JO-AQ, JO-AM, JO-AJ');
@@ -106,7 +106,7 @@ test('throws exception when invoice items are missing', function () {
         ->setName('Seller Company')
         ->setTin('12345678');
 
-    $invoice->buyerInformation()
+    $invoice->customerInformation()
         ->setId('987654321', 'TIN')
         ->setName('Customer 123');
 
@@ -134,7 +134,7 @@ test('it throws exception when manually set totals do not match item calculation
         ->setTin('12345678');
 
     // Add required buyer info
-    $invoice->buyerInformation()
+    $invoice->customerInformation()
         ->setId('987654321', 'TIN')
         ->setName('Customer 123');
 
@@ -176,7 +176,7 @@ test('generates a valid XML payload as per the UBL 2.1 schema', function () {
         ->setTin('12345678');
 
     // 3. Buyer Information
-    $invoice->buyerInformation()
+    $invoice->customerInformation()
         ->setId('987654321', 'TIN')
         ->setName('Customer 123')
         ->setPostalCode('11937')
@@ -227,7 +227,7 @@ test('generates valid XML for cash invoice with tax exempt item', function () {
         ->setTin('12345678');
 
     // 3. Buyer Information
-    $invoice->buyerInformation()
+    $invoice->customerInformation()
         ->setId('987654321', 'TIN')
         ->setName('Customer 123')
         ->setPostalCode('11937')
@@ -363,7 +363,7 @@ test('it auto-calculates invoice totals correctly', function () {
         ->setTin('12345678');
 
     // Add required buyer info
-    $invoice->buyerInformation()
+    $invoice->customerInformation()
         ->setId('987654321', 'TIN')
         ->setName('Customer 123');
 
