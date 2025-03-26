@@ -7,7 +7,7 @@ use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 uses(XmlSchemaValidator::class, XmlHelperTrait::class);
 
 // Helper function to set up common invoice sections
-function setupBasicInvoice(): JoFotaraService
+function setupBasicInvoice(string $invoiceType = 'income'): JoFotaraService
 {
     $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
 
@@ -15,6 +15,7 @@ function setupBasicInvoice(): JoFotaraService
         ->setInvoiceId('INV-001')
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
         ->setIssueDate('16-02-2025')
+        ->setInvoiceType($invoiceType)
         ->cash();
 
     return $invoice;
@@ -192,6 +193,7 @@ test('generates a valid XML payload as per the UBL 2.1 schema', function () {
         ->setInvoiceId('INV-001')
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
         ->setIssueDate('16-02-2025')
+        ->setInvoiceType('income')
         ->cash();
 
     // 2. Seller Information
@@ -243,6 +245,7 @@ test('generates valid XML for cash invoice with tax exempt item', function () {
         ->setInvoiceId('INV-001')
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
         ->setIssueDate('16-02-2025')
+        ->setInvoiceType('income')
         ->cash();
 
     // 2. Seller Information
@@ -371,6 +374,98 @@ XML);
     expect($invoice->generateXml())->toBe($expectedXml);
 });
 
+test('generates valid XML for general sales invoice with cash payment', function () {
+    $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
+
+    // 1. Basic Information
+    $invoice->basicInformation()
+        ->setInvoiceId('INV-001')
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025')
+        ->setInvoiceType('general_sales')
+        ->cash();
+
+    // 2. Seller Information
+    $invoice->sellerInformation()
+        ->setName('Seller Company')
+        ->setTin('12345678');
+
+    // 3. Buyer Information
+    $invoice->customerInformation()
+        ->setId('987654321', 'TIN')
+        ->setName('Customer 123')
+        ->setPostalCode('11937')
+        ->setCityCode('JO-IR');
+
+    // 4. Seller Supplier Party
+    $invoice->supplierIncomeSource('123456789');
+
+    // 5. Invoice Items
+    $invoice->items()
+        ->addItem('1')
+        ->setQuantity(2)
+        ->setUnitPrice(10.0)
+        ->setDescription('Test Item')
+        ->tax(16);
+
+    // 6. Invoice Totals (will be auto-calculated)
+    $invoice->invoiceTotals();
+
+    // Generate XML and check for the correct invoice type code
+    $xml = $invoice->generateXml();
+    expect($xml)->toContain('<cbc:InvoiceTypeCode name="012">388</cbc:InvoiceTypeCode>');
+
+    // Validate against schema
+    $result = $this->validateAgainstUblSchema($this->normalizeXml($xml));
+    expect($result['isValid'])->toBeTrue();
+});
+
+test('generates valid XML for special sales invoice with receivable payment', function () {
+    $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
+
+    // 1. Basic Information
+    $invoice->basicInformation()
+        ->setInvoiceId('INV-001')
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025')
+        ->setInvoiceType('special_sales')
+        ->receivable();
+
+    // 2. Seller Information
+    $invoice->sellerInformation()
+        ->setName('Seller Company')
+        ->setTin('12345678');
+
+    // 3. Buyer Information
+    $invoice->customerInformation()
+        ->setId('987654321', 'TIN')
+        ->setName('Customer 123')
+        ->setPostalCode('11937')
+        ->setCityCode('JO-IR');
+
+    // 4. Seller Supplier Party
+    $invoice->supplierIncomeSource('123456789');
+
+    // 5. Invoice Items
+    $invoice->items()
+        ->addItem('1')
+        ->setQuantity(2)
+        ->setUnitPrice(10.0)
+        ->setDescription('Test Item')
+        ->tax(16);
+
+    // 6. Invoice Totals (will be auto-calculated)
+    $invoice->invoiceTotals();
+
+    // Generate XML and check for the correct invoice type code
+    $xml = $invoice->generateXml();
+    expect($xml)->toContain('<cbc:InvoiceTypeCode name="023">388</cbc:InvoiceTypeCode>');
+
+    // Validate against schema
+    $result = $this->validateAgainstUblSchema($this->normalizeXml($xml));
+    expect($result['isValid'])->toBeTrue();
+});
+
 test('it auto-calculates invoice totals correctly', function () {
     $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
 
@@ -379,6 +474,7 @@ test('it auto-calculates invoice totals correctly', function () {
         ->setInvoiceId('INV-001')
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
         ->setIssueDate('16-02-2025')
+        ->setInvoiceType('income')
         ->cash();
 
     // Add required seller info
