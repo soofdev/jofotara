@@ -3,6 +3,7 @@
 namespace JBadarneh\JoFotara;
 
 use InvalidArgumentException;
+use JBadarneh\JoFotara\Response\JoFotaraResponse;
 use JBadarneh\JoFotara\Sections\BasicInvoiceInformation;
 use JBadarneh\JoFotara\Sections\CustomerInformation;
 use JBadarneh\JoFotara\Sections\InvoiceItems;
@@ -267,18 +268,17 @@ class JoFotaraService
     /**
      * Send the invoice to the JoFotara API
      *
-     * @return array Response from the API containing success status and QR code if successful
+     * @return JoFotaraResponse A response object containing the API response data
      *
      * @throws InvalidArgumentException If configuration is missing
      * @throws RuntimeException If the API request fails
      */
-    public function send(): array
+    public function send(): JoFotaraResponse
     {
-
         $encodedInvoice = $this->encodeInvoice();
 
-        $ch = curl_init(self::API_URL);
-        curl_setopt_array($ch, [
+        $curlHandle = curl_init(self::API_URL);
+        curl_setopt_array($curlHandle, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
             CURLOPT_HTTPHEADER => [
@@ -291,24 +291,27 @@ class JoFotaraService
             ]),
         ]);
 
-        $response = curl_exec($ch);
-        $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $error = curl_error($ch);
-        curl_close($ch);
+        $response = curl_exec($curlHandle);
+        $statusCode = curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);
+        $error = curl_error($curlHandle);
+        curl_close($curlHandle);
 
         if ($error) {
             throw new RuntimeException('Failed to send invoice: '.$error);
         }
-
-        if ($statusCode !== 200) {
-            throw new RuntimeException('API request failed with status code '.$statusCode);
-        }
-
+        
+        // Parse the response even if status code is not 200
         $result = json_decode($response, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new RuntimeException('Failed to parse API response');
         }
-
-        return $result;
+        
+        // Handle both 200 and 400 responses with the JoFotaraResponse object
+        if ($statusCode !== 200 && $statusCode !== 400) {
+            throw new RuntimeException('API request failed with status code '.$statusCode);
+        }
+        
+        // Create a response object that can handle both success and error responses
+        return new JoFotaraResponse($result, $statusCode);
     }
 }
