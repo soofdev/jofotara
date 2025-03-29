@@ -11,18 +11,18 @@ test('it correctly identifies a successful response', function () {
                     'code' => 'XSD_VALID',
                     'category' => 'XSD validation',
                     'message' => 'Complied with UBL 2.1 standards in line with ZATCA specifications',
-                    'status' => 'PASS'
-                ]
+                    'status' => 'PASS',
+                ],
             ],
             'warningMessages' => [],
             'errorMessages' => [],
-            'status' => 'PASS'
+            'status' => 'PASS',
         ],
         'invoiceStatus' => 'SUBMITTED',
         'submittedInvoice' => 'base64encodedcontent',
         'qrCode' => 'qrcodedata',
         'invoiceNumber' => 'EIN00032',
-        'invoiceUUID' => '6c13d4a6-8fa9-46b4-b9e0-fb74b7c3f44a'
+        'invoiceUUID' => '6c13d4a6-8fa9-46b4-b9e0-fb74b7c3f44a',
     ];
 
     $response = new JoFotaraResponse($successResponse, 200);
@@ -52,15 +52,15 @@ test('it correctly identifies an error response', function () {
                     'status' => 'ERROR',
                     'EINV_CODE' => 'XSD_INVALID',
                     'EINV_CATEGORY' => 'XSD validation',
-                    'EINV_MESSAGE' => 'Schema validation failed; XML does not comply with UBL 2.1 standards'
-                ]
-            ]
+                    'EINV_MESSAGE' => 'Schema validation failed; XML does not comply with UBL 2.1 standards',
+                ],
+            ],
         ],
         'EINV_STATUS' => 'NOT_SUBMITTED',
         'EINV_SINGED_INVOICE' => null,
         'EINV_QR' => null,
         'EINV_NUM' => null,
-        'EINV_INV_UUID' => null
+        'EINV_INV_UUID' => null,
     ];
 
     $response = new JoFotaraResponse($errorResponse, 200);
@@ -83,13 +83,13 @@ test('it correctly identifies an error response', function () {
 test('it provides access to raw response data', function () {
     $responseData = [
         'validationResults' => [
-            'status' => 'PASS'
+            'status' => 'PASS',
         ],
-        'invoiceStatus' => 'SUBMITTED'
+        'invoiceStatus' => 'SUBMITTED',
     ];
 
     $response = new JoFotaraResponse($responseData, 200);
-    
+
     expect($response->getRawResponse())->toBe($responseData)
         ->and($response->getStatusCode())->toBe(200);
 });
@@ -101,16 +101,16 @@ test('it handles info messages correctly', function () {
                 [
                     'type' => 'INFO',
                     'code' => 'INFO_CODE',
-                    'message' => 'Information message'
-                ]
+                    'message' => 'Information message',
+                ],
             ],
-            'status' => 'PASS'
+            'status' => 'PASS',
         ],
-        'invoiceStatus' => 'SUBMITTED'
+        'invoiceStatus' => 'SUBMITTED',
     ];
 
     $response = new JoFotaraResponse($responseData, 200);
-    
+
     expect($response->getInfoMessages())->toHaveCount(1)
         ->and($response->getInfoMessages()[0]['code'])->toBe('INFO_CODE');
 });
@@ -122,16 +122,16 @@ test('it handles warning messages correctly', function () {
                 [
                     'type' => 'WARNING',
                     'code' => 'WARNING_CODE',
-                    'message' => 'Warning message'
-                ]
+                    'message' => 'Warning message',
+                ],
             ],
-            'status' => 'PASS'
+            'status' => 'PASS',
         ],
-        'invoiceStatus' => 'SUBMITTED'
+        'invoiceStatus' => 'SUBMITTED',
     ];
 
     $response = new JoFotaraResponse($responseData, 200);
-    
+
     expect($response->getWarnings())->toHaveCount(1)
         ->and($response->hasWarnings())->toBeTrue()
         ->and($response->getWarnings()[0]['code'])->toBe('WARNING_CODE');
@@ -145,21 +145,21 @@ test('it handles alternative response format correctly', function () {
                 [
                     'type' => 'INFO',
                     'EINV_CODE' => 'INFO_CODE',
-                    'EINV_MESSAGE' => 'Information message'
-                ]
+                    'EINV_MESSAGE' => 'Information message',
+                ],
             ],
             'WARNINGS' => [],
-            'ERRORS' => []
+            'ERRORS' => [],
         ],
         'EINV_STATUS' => 'SUBMITTED',
         'EINV_SINGED_INVOICE' => 'base64content',
         'EINV_QR' => 'qrdata',
         'EINV_NUM' => 'EIN12345',
-        'EINV_INV_UUID' => 'uuid-string'
+        'EINV_INV_UUID' => 'uuid-string',
     ];
 
     $response = new JoFotaraResponse($alternativeResponse, 200);
-    
+
     expect($response->isSuccess())->toBeTrue()
         ->and($response->getStatusCode())->toBe(200)
         ->and($response->getInvoiceStatus())->toBe('SUBMITTED')
@@ -175,12 +175,12 @@ test('it handles HTTP 400 error responses', function () {
         'error' => [
             'code' => 'VALIDATION_ERROR',
             'message' => 'Invoice validation failed',
-            'details' => 'Missing required fields'
-        ]
+            'details' => 'Missing required fields',
+        ],
     ];
 
     $response = new JoFotaraResponse($errorResponse, 400);
-    
+
     expect($response->isSuccess())->toBeFalse()
         ->and($response->getStatusCode())->toBe(400)
         ->and($response->hasErrors())->toBeTrue()
@@ -190,11 +190,11 @@ test('it handles HTTP 400 error responses', function () {
 test('it creates a generic error for unstructured 400 responses', function () {
     $errorResponse = [
         'message' => 'Something went wrong',
-        'timestamp' => '2025-03-29T18:16:23+03:00'
+        'timestamp' => '2025-03-29T18:16:23+03:00',
     ];
 
     $response = new JoFotaraResponse($errorResponse, 400);
-    
+
     expect($response->isSuccess())->toBeFalse()
         ->and($response->getStatusCode())->toBe(400)
         ->and($response->hasErrors())->toBeTrue()
@@ -212,21 +212,21 @@ test('it treats ALREADY_SUBMITTED status as success', function () {
                     'status' => 'PASS',
                     'EINV_CODE' => 'XSD_VALID',
                     'EINV_CATEGORY' => 'XSD validation',
-                    'EINV_MESSAGE' => 'Complied with UBL 2.1 standards'
-                ]
+                    'EINV_MESSAGE' => 'Complied with UBL 2.1 standards',
+                ],
             ],
             'WARNINGS' => [],
-            'ERRORS' => []
+            'ERRORS' => [],
         ],
         'EINV_STATUS' => 'ALREADY_SUBMITTED',
         'EINV_SINGED_INVOICE' => 'base64content',
         'EINV_QR' => 'qrcodedata',
         'EINV_NUM' => '002',
-        'EINV_INV_UUID' => '123e4567-e89b-12d3-a456-111111111112'
+        'EINV_INV_UUID' => '123e4567-e89b-12d3-a456-111111111112',
     ];
 
     $response = new JoFotaraResponse($alreadySubmittedResponse, 200);
-    
+
     expect($response->isSuccess())->toBeTrue()
         ->and($response->getStatusCode())->toBe(200)
         ->and($response->getInvoiceStatus())->toBe('ALREADY_SUBMITTED')
