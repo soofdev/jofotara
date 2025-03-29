@@ -6,7 +6,7 @@ use InvalidArgumentException;
 use JBadarneh\JoFotara\Contracts\ValidatableSection;
 use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 
-class BuyerInformation implements ValidatableSection
+class CustomerInformation implements ValidatableSection
 {
     use XmlHelperTrait;
 
@@ -40,7 +40,7 @@ class BuyerInformation implements ValidatableSection
     private ?string $tin = null;
 
     /**
-     * Set the buyer's identification number
+     * Set the customer's identification number
      *
      * @param  string  $id  The identification number
      * @param  string  $type  The type of ID (NIN, PN, or TIN)
@@ -61,7 +61,7 @@ class BuyerInformation implements ValidatableSection
     }
 
     /**
-     * Set the buyer's postal code
+     * Set the customer's postal code
      *
      * @param  string  $code  The postal code
      */
@@ -73,7 +73,7 @@ class BuyerInformation implements ValidatableSection
     }
 
     /**
-     * Set the buyer's city code
+     * Set the customer's city code
      *
      * @param  string  $code  The city code
      */
@@ -89,10 +89,10 @@ class BuyerInformation implements ValidatableSection
     }
 
     /**
-     * Set the buyer's name
+     * Set the customer's name
      * Note: This is mandatory for receivable invoices or cash invoices > 10000 JOD
      *
-     * @param  string  $name  The buyer's name
+     * @param  string  $name  The customer's name
      */
     public function setName(string $name): self
     {
@@ -102,7 +102,7 @@ class BuyerInformation implements ValidatableSection
     }
 
     /**
-     * Set the buyer's phone number
+     * Set the customer's phone number
      *
      * @param  string  $phone  The phone number
      */
@@ -114,9 +114,9 @@ class BuyerInformation implements ValidatableSection
     }
 
     /**
-     * Set the buyer's TIN
+     * Set the customer's TIN
      *
-     * @param  string  $tin  The buyer's TIN
+     * @param  string  $tin  The customer's TIN
      */
     public function setTin(string $tin): self
     {
@@ -126,9 +126,9 @@ class BuyerInformation implements ValidatableSection
     }
 
     /**
-     * Convert the buyer information to XML
+     * Convert the customer information to XML
      *
-     * @return string The XML representation of the buyer information
+     * @return string The XML representation of the customer information
      */
     public function toXml(): string
     {
@@ -136,7 +136,7 @@ class BuyerInformation implements ValidatableSection
         $xml[] = '<cac:AccountingCustomerParty>';
         $xml[] = '    <cac:Party>';
 
-        // Buyer identification
+        // Customer identification
         if ($this->id !== null && $this->idType !== null) {
             $xml[] = '        <cac:PartyIdentification>';
             $xml[] = sprintf('            <cbc:ID schemeID="%s">%s</cbc:ID>',
@@ -203,7 +203,7 @@ class BuyerInformation implements ValidatableSection
     }
 
     /**
-     * Get the current state of the buyer information as an array
+     * Get the current state of the customer information as an array
      * This is mainly used for testing purposes
      */
     public function toArray(): array
@@ -228,17 +228,17 @@ class BuyerInformation implements ValidatableSection
     {
         // Validate required ID and type
         if (! isset($this->id) || ! isset($this->idType)) {
-            throw new InvalidArgumentException('Buyer ID and type are required');
+            throw new InvalidArgumentException('Customer ID and type are required');
         }
 
         // Validate ID type
         if (! in_array($this->idType, ['NIN', 'PN', 'TIN'])) {
-            throw new InvalidArgumentException('Invalid buyer ID type. Must be NIN, PN, or TIN');
+            throw new InvalidArgumentException('Invalid customer ID type. Must be NIN, PN, or TIN');
         }
 
         // Validate ID is not empty
         if (empty(trim($this->id))) {
-            throw new InvalidArgumentException('Buyer ID cannot be empty');
+            throw new InvalidArgumentException('Customer ID cannot be empty');
         }
 
         // Validate city code if set

@@ -5,11 +5,12 @@ use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 
 uses(XmlHelperTrait::class);
 
-test('it generates exact XML structure', function () {
+test('it generates exact XML structure for general sales invoice', function () {
     $invoice = new BasicInvoiceInformation;
     $invoice->setInvoiceId('INV001')
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
         ->setIssueDate('16-02-2025')
+        ->setInvoiceType('general_sales')
         ->setPaymentMethod('012')
         ->setNote('Test invoice')
         ->setInvoiceCounter(1);
@@ -36,6 +37,7 @@ test('it generates valid XML with all required fields', function () {
     $invoice->setInvoiceId('INV001')
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
         ->setIssueDate('16-02-2025')
+        ->setInvoiceType('general_sales')
         ->setPaymentMethod('012')
         ->setNote('Test invoice')
         ->setInvoiceCounter(1);
@@ -59,7 +61,9 @@ test('it defaults to JOD currency', function () {
     $invoice = new BasicInvoiceInformation;
     $invoice->setInvoiceId('INV001')
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
-        ->setIssueDate('16-02-2025');
+        ->setIssueDate('16-02-2025')
+        ->setInvoiceType('income')
+        ->cash();
 
     $xml = $invoice->toXml();
 
@@ -71,7 +75,9 @@ test('it generates valid XML without optional note', function () {
     $invoice = new BasicInvoiceInformation;
     $invoice->setInvoiceId('INV001')
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
-        ->setIssueDate('16-02-2025');
+        ->setIssueDate('16-02-2025')
+        ->setInvoiceType('income')
+        ->cash();
 
     $xml = $invoice->toXml();
 
@@ -109,7 +115,9 @@ test('it formats date correctly in XML', function () {
     $invoice = new BasicInvoiceInformation;
     $invoice->setInvoiceId('INV001')
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
-        ->setIssueDate('16-02-2025');
+        ->setIssueDate('16-02-2025')
+        ->setInvoiceType('income')
+        ->cash();
 
     $xml = $invoice->toXml();
 
@@ -121,6 +129,8 @@ test('it properly handles Arabic text in note', function () {
     $invoice->setInvoiceId('INV001')
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
         ->setIssueDate('16-02-2025')
+        ->setInvoiceType('income')
+        ->cash()
         ->setNote('ملاحظة على الفاتورة');
 
     $xml = $invoice->toXml();
@@ -133,6 +143,8 @@ test('it escapes special characters in XML', function () {
     $invoice->setInvoiceId('INV001')
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
         ->setIssueDate('16-02-2025')
+        ->setInvoiceType('income')
+        ->cash()
         ->setNote('Note with special chars: < > & " \'');
 
     $xml = $invoice->toXml();
@@ -146,9 +158,103 @@ test('it handles DateTime object for issue date', function () {
 
     $invoice->setInvoiceId('INV001')
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
-        ->setIssueDate($date);
+        ->setIssueDate($date)
+        ->setInvoiceType('income')
+        ->cash();
 
     $xml = $invoice->toXml();
 
     expect($xml)->toContain('<cbc:IssueDate>2025-02-16</cbc:IssueDate>');
+});
+
+test('it generates XML for income invoice with cash payment', function () {
+    $invoice = new BasicInvoiceInformation;
+    $invoice->setInvoiceId('INV001')
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025')
+        ->setInvoiceType('income')
+        ->cash();
+
+    $xml = $invoice->toXml();
+
+    expect($xml)->toContain('<cbc:InvoiceTypeCode name="011">388</cbc:InvoiceTypeCode>');
+});
+
+test('it generates XML for income invoice with receivable payment', function () {
+    $invoice = new BasicInvoiceInformation;
+    $invoice->setInvoiceId('INV001')
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025')
+        ->setInvoiceType('income')
+        ->receivable();
+
+    $xml = $invoice->toXml();
+
+    expect($xml)->toContain('<cbc:InvoiceTypeCode name="021">388</cbc:InvoiceTypeCode>');
+});
+
+test('it generates XML for general sales invoice with cash payment', function () {
+    $invoice = new BasicInvoiceInformation;
+    $invoice->setInvoiceId('INV001')
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025')
+        ->setInvoiceType('general_sales')
+        ->cash();
+
+    $xml = $invoice->toXml();
+
+    expect($xml)->toContain('<cbc:InvoiceTypeCode name="012">388</cbc:InvoiceTypeCode>');
+});
+
+test('it generates XML for general sales invoice with receivable payment', function () {
+    $invoice = new BasicInvoiceInformation;
+    $invoice->setInvoiceId('INV001')
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025')
+        ->setInvoiceType('general_sales')
+        ->receivable();
+
+    $xml = $invoice->toXml();
+
+    expect($xml)->toContain('<cbc:InvoiceTypeCode name="022">388</cbc:InvoiceTypeCode>');
+});
+
+test('it generates XML for special sales invoice with cash payment', function () {
+    $invoice = new BasicInvoiceInformation;
+    $invoice->setInvoiceId('INV001')
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025')
+        ->setInvoiceType('special_sales')
+        ->cash();
+
+    $xml = $invoice->toXml();
+
+    expect($xml)->toContain('<cbc:InvoiceTypeCode name="013">388</cbc:InvoiceTypeCode>');
+});
+
+test('it generates XML for special sales invoice with receivable payment', function () {
+    $invoice = new BasicInvoiceInformation;
+    $invoice->setInvoiceId('INV001')
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025')
+        ->setInvoiceType('special_sales')
+        ->receivable();
+
+    $xml = $invoice->toXml();
+
+    expect($xml)->toContain('<cbc:InvoiceTypeCode name="023">388</cbc:InvoiceTypeCode>');
+});
+
+test('it throws exception when invoice type is not set', function () {
+    $invoice = new BasicInvoiceInformation;
+    $invoice->setInvoiceId('INV001')
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025');
+
+    expect(fn () => $invoice->cash())
+        ->toThrow(InvalidArgumentException::class, 'Invoice type must be set before setting payment method. Use setInvoiceType() first.');
+
+    // Should also throw when trying to validate
+    expect(fn () => $invoice->validateSection())
+        ->toThrow(InvalidArgumentException::class);
 });
