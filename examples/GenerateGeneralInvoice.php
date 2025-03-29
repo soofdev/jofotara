@@ -10,11 +10,11 @@ $configs = [
     'invoice_type' => 'income',
     'invoice_id' => 'INV-001',
     'uuid' => '123e4567-e89b-12d3-a456-426614174000',
-    
+
     'seller_tin' => '12345678',
     'seller_name' => 'Your Company Name',
     'supplier_income_source' => '987654321',
-    
+
     'customer_id' => '987654321',
     'customer_tin' => '98765432',
     'customer_name' => 'Customer Name',
@@ -25,7 +25,7 @@ $configs = [
     'product_quantity' => 2,
     'product_unit_price' => 100.00,
     'product_description' => 'Sample Product Description',
-    
+
     'issue_date' => '16-02-2023',
 ];
 
@@ -66,7 +66,7 @@ var_dump($invoice->generateXml());
 
 // Encode the invoice to base64 (for demonstration purposes)
 $encodedInvoice = $invoice->encodeInvoice();
-echo "Encoded Invoice:\n";  
+echo "Encoded Invoice:\n";
 echo "------------------------------\n";
 echo '"'.$encodedInvoice.'"'."\n\n";
 echo "------------------------------\n";
@@ -84,18 +84,18 @@ $mockSuccessResponse = [
                 'code' => 'XSD_VALID',
                 'category' => 'XSD validation',
                 'message' => 'Complied with UBL 2.1 standards in line with ZATCA specifications',
-                'status' => 'PASS'
-            ]
+                'status' => 'PASS',
+            ],
         ],
         'warningMessages' => [],
         'errorMessages' => [],
-        'status' => 'PASS'
+        'status' => 'PASS',
     ],
     'invoiceStatus' => 'SUBMITTED',
     'submittedInvoice' => $encodedInvoice,
     'qrCode' => 'qrcodedata',
     'invoiceNumber' => $configs['invoice_id'],
-    'invoiceUUID' => $configs['uuid']
+    'invoiceUUID' => $configs['uuid'],
 ];
 
 // // Create a response object from the mock data
@@ -131,18 +131,17 @@ $mockSuccessResponse = [
 //     echo "\nNo warnings found.\n";
 // }
 
-
-//In a real application, you would use:
+// In a real application, you would use:
 try {
     $response = $invoice->send();
-    
+
     if ($response->isSuccess()) {
         echo "Invoice successfully submitted!\n";
-        echo "Invoice UUID: " . $response->getInvoiceUuid() . "\n";
+        echo 'Invoice UUID: '.$response->getInvoiceUuid()."\n";
     } else {
         echo "Invoice submission failed:\n";
-        echo $response->getErrorSummary() . "\n";
+        echo $response->getErrorSummary()."\n";
     }
 } catch (\Exception $e) {
-    echo "Error: " . $e->getMessage() . "\n";
+    echo 'Error: '.$e->getMessage()."\n";
 }

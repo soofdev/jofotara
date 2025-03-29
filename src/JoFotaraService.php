@@ -299,18 +299,18 @@ class JoFotaraService
         if ($error) {
             throw new RuntimeException('Failed to send invoice: '.$error);
         }
-        
+
         // Parse the response even if status code is not 200
         $result = json_decode($response, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new RuntimeException('Failed to parse API response');
         }
-        
+
         // Handle both 200 and 400 responses with the JoFotaraResponse object
         if ($statusCode !== 200 && $statusCode !== 400) {
             throw new RuntimeException('API request failed with status code '.$statusCode);
         }
-        
+
         // Create a response object that can handle both success and error responses
         return new JoFotaraResponse($result, $statusCode);
     }
