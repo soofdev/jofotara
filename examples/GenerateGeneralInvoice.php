@@ -105,16 +105,16 @@ $response = new \JBadarneh\JoFotara\Response\JoFotaraResponse($mockSuccessRespon
 echo "\nResponse Handling Example:\n";
 echo "---------------------------\n";
 
-echo "Is Success: " . ($response->isSuccess() ? 'Yes' : 'No') . "\n";
-echo "Invoice Status: " . $response->getInvoiceStatus() . "\n";
-echo "Invoice Number: " . $response->getInvoiceNumber() . "\n";
-echo "Invoice UUID: " . $response->getInvoiceUuid() . "\n";
-echo "QR Code: " . $response->getQrCode() . "\n";
+echo 'Is Success: '.($response->isSuccess() ? 'Yes' : 'No')."\n";
+echo 'Invoice Status: '.$response->getInvoiceStatus()."\n";
+echo 'Invoice Number: '.$response->getInvoiceNumber()."\n";
+echo 'Invoice UUID: '.$response->getInvoiceUuid()."\n";
+echo 'QR Code: '.$response->getQrCode()."\n";
 
 // Check for errors
 if ($response->hasErrors()) {
     echo "\nErrors:\n";
-    echo $response->getErrorSummary() . "\n";
+    echo $response->getErrorSummary()."\n";
 } else {
     echo "\nNo errors found.\n";
 }
