@@ -40,6 +40,11 @@ class BasicInvoiceInformation implements ValidatableSection
 
     private int $invoiceCounter = 1;
 
+    private bool $isCreditInvoice = false;
+    private ?string $originalInvoiceId = null;
+    private ?string $originalInvoiceUuid = null;
+    private ?float $originalFullAmount = null;
+
     /**
      * Set the invoice ID (required)
      *
@@ -213,6 +218,26 @@ class BasicInvoiceInformation implements ValidatableSection
     }
 
     /**
+     * Set this invoice as a credit invoice
+     */
+    public function asCreditInvoice(string $originalInvoiceId, string $originalInvoiceUuid, float $originalFullAmount): self
+    {
+        $this->isCreditInvoice = true;
+        $this->originalInvoiceId = $originalInvoiceId;
+        $this->originalInvoiceUuid = $originalInvoiceUuid;
+        $this->originalFullAmount = $originalFullAmount;
+        return $this;
+    }
+
+    /**
+     * Check if this is a credit invoice
+     */
+    public function isCreditInvoice(): bool
+    {
+        return $this->isCreditInvoice;
+    }
+
+    /**
      * Convert the basic invoice information to XML
      *
      * @return string The XML representation of the basic invoice information
@@ -242,7 +267,7 @@ class BasicInvoiceInformation implements ValidatableSection
         if (! isset($this->paymentMethod)) {
             throw new InvalidArgumentException('Payment method is required. Use cash(), receivable(), or setPaymentMethod() to set it.');
         }
-        $xml[] = sprintf('<cbc:InvoiceTypeCode name="%s">388</cbc:InvoiceTypeCode>', $this->escapeXml($this->paymentMethod));
+        $xml[] = sprintf('<cbc:InvoiceTypeCode name="%s">%s</cbc:InvoiceTypeCode>', $this->escapeXml($this->paymentMethod), $this->isCreditInvoice ? '381' : '388');
 
         // Optional note
         if ($this->note !== null) {
@@ -252,6 +277,17 @@ class BasicInvoiceInformation implements ValidatableSection
         // Currency codes
         $xml[] = sprintf('<cbc:DocumentCurrencyCode>%s</cbc:DocumentCurrencyCode>', $this->escapeXml($this->currency));
         $xml[] = sprintf('<cbc:TaxCurrencyCode>%s</cbc:TaxCurrencyCode>', $this->escapeXml($this->currency));
+
+        // Billing reference for credit invoices
+        if ($this->isCreditInvoice) {
+            $xml[] = '<cac:BillingReference>';
+            $xml[] = '    <cac:InvoiceDocumentReference>';
+            $xml[] = '        <cbc:ID>' . $this->escapeXml($this->originalInvoiceId) . '</cbc:ID>';
+            $xml[] = '        <cbc:UUID>' . $this->escapeXml($this->originalInvoiceUuid) . '</cbc:UUID>';
+            $xml[] = '        <cbc:DocumentDescription>' . number_format($this->originalFullAmount, 2) . '</cbc:DocumentDescription>';
+            $xml[] = '    </cac:InvoiceDocumentReference>';
+            $xml[] = '</cac:BillingReference>';
+        }
 
         // Invoice counter
         $xml[] = '<cac:AdditionalDocumentReference>';
@@ -268,7 +304,7 @@ class BasicInvoiceInformation implements ValidatableSection
      */
     public function toArray(): array
     {
-        return [
+        $data = [
             'invoiceId' => $this->invoiceId ?? null,
             'uuid' => $this->uuid ?? null,
             'issueDate' => isset($this->issueDate) ? $this->issueDate->format('d-m-Y') : null,
@@ -277,7 +313,16 @@ class BasicInvoiceInformation implements ValidatableSection
             'note' => $this->note,
             'currency' => $this->currency,
             'invoiceCounter' => $this->invoiceCounter,
+            'isCreditInvoice' => $this->isCreditInvoice,
         ];
+
+        if ($this->isCreditInvoice) {
+            $data['originalInvoiceId'] = $this->originalInvoiceId;
+            $data['originalInvoiceUuid'] = $this->originalInvoiceUuid;
+            $data['originalFullAmount'] = $this->originalFullAmount;
+        }
+
+        return $data;
     }
 
     /**
@@ -301,6 +346,18 @@ class BasicInvoiceInformation implements ValidatableSection
 
         if (! isset($this->invoiceType)) {
             throw new InvalidArgumentException('Invoice type is required. Use setInvoiceType() to set it.');
+        }
+
+        if ($this->isCreditInvoice) {
+            if (empty($this->originalInvoiceId)) {
+                throw new InvalidArgumentException('Original invoice ID is required for credit invoices');
+            }
+            if (empty($this->originalInvoiceUuid)) {
+                throw new InvalidArgumentException('Original invoice UUID is required for credit invoices');
+            }
+            if ($this->originalFullAmount === null || $this->originalFullAmount <= 0) {
+                throw new InvalidArgumentException('Original invoice amount must be greater than zero');
+            }
         }
 
         if (! isset($this->paymentMethod)) {

@@ -10,6 +10,8 @@ use JBadarneh\JoFotara\Sections\InvoiceItems;
 use JBadarneh\JoFotara\Sections\InvoiceTotals;
 use JBadarneh\JoFotara\Sections\SellerInformation;
 use JBadarneh\JoFotara\Sections\SupplierIncomeSource;
+use JBadarneh\JoFotara\Sections\BillingReference;
+use JBadarneh\JoFotara\Sections\ReasonForReturn;
 use RuntimeException;
 
 class JoFotaraService
@@ -27,6 +29,10 @@ class JoFotaraService
     private ?InvoiceItems $items = null;
 
     private ?InvoiceTotals $invoiceTotals = null;
+
+    private ?BillingReference $billingReference = null;
+
+    private ?ReasonForReturn $reasonForReturn = null;
 
     private string $clientId;
 
@@ -100,6 +106,34 @@ class JoFotaraService
     }
 
     /**
+     * Get the billing reference section builder
+     */
+    public function billingReference(): BillingReference
+    {
+        if (! $this->billingReference) {
+            $this->billingReference = new BillingReference;
+        }
+
+        return $this->billingReference;
+    }
+
+    /**
+     * Set the reason for return
+     *
+     * @param  string  $reason  The reason for returning the invoice
+     */
+    public function setReasonForReturn(string $reason): self
+    {
+        if (! $this->reasonForReturn) {
+            $this->reasonForReturn = new ReasonForReturn;
+        }
+
+        $this->reasonForReturn->setReason($reason);
+
+        return $this;
+    }
+
+    /**
      * Get the monetary totals section builder
      */
     public function invoiceTotals(): InvoiceTotals
@@ -141,6 +175,17 @@ class JoFotaraService
      */
     private function validateSections(): void
     {
+        // Validate basic information first
+        $this->basicInfo->validateSection();
+
+        // Validate credit invoice requirements before other validations
+        if ($this->basicInfo->isCreditInvoice()) {
+            if (empty($this->reasonForReturn)) {
+                throw new InvalidArgumentException('Credit invoices require a reason for return');
+            }
+            $this->reasonForReturn->validateSection();
+        }
+
         // Validate all required sections are initialized
         if (! $this->sellerInfo) {
             throw new InvalidArgumentException('Seller information is required');
@@ -157,7 +202,6 @@ class JoFotaraService
         }
 
         // Validate each section individually
-        $this->basicInfo->validateSection();
         $this->sellerInfo->validateSection();
         // Validate customer information if set
         if ($this->customerInfo) {
@@ -235,6 +279,11 @@ class JoFotaraService
         // Add Supplier information if set
         if ($this->supplierIncomeSource) {
             $xml[] = $this->supplierIncomeSource->toXml();
+        }
+
+        // Add reason for return for credit invoices
+        if ($this->basicInfo->isCreditInvoice() && $this->reasonForReturn) {
+            $xml[] = $this->reasonForReturn->toXml();
         }
 
         // Add invoice totals

@@ -45,6 +45,20 @@ test('it validates date format', function () {
 
 });
 
+test('it supports credit invoice type', function () {
+    $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
+
+    $invoice->basicInformation()
+        ->setInvoiceId('CR-001')
+        ->setUuid('123e4567-e89b-12d3-a456-426614174000')
+        ->setIssueDate('16-02-2025')
+        ->setInvoiceType('general_sales')
+        ->asCreditInvoice('INV-001', 'original-uuid', 200.00)
+        ->cash();
+
+    expect($invoice->basicInformation()->isCreditInvoice())->toBeTrue();
+});
+
 test('it validates invoice counter', function () {
     $invoice = new JoFotaraService('test-client-id', 'test-client-secret');
 
