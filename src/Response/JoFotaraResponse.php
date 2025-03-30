@@ -95,6 +95,24 @@ class JoFotaraResponse
     }
 
     /**
+     * Get the submitted invoice decoded from base64 to XML
+     */
+    public function getInvoiceAsXml(): ?string
+    {
+        $base64Invoice = $this->getSubmittedInvoice();
+        if ($base64Invoice === null) {
+            return null;
+        }
+
+        $decoded = base64_decode($base64Invoice, true);
+        if ($decoded === false) {
+            return null;
+        }
+
+        return $decoded;
+    }
+
+    /**
      * Get the QR code for the invoice
      */
     public function getQrCode(): ?string

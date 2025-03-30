@@ -94,6 +94,31 @@ test('it provides access to raw response data', function () {
         ->and($response->getStatusCode())->toBe(200);
 });
 
+test('it decodes base64 invoice to XML correctly', function () {
+    $xmlContent = '<?xml version="1.0"?><Invoice>Test</Invoice>';
+    $base64Invoice = base64_encode($xmlContent);
+
+    $response = new JoFotaraResponse([
+        'submittedInvoice' => $base64Invoice
+    ]);
+
+    expect($response->getInvoiceAsXml())->toBe($xmlContent);
+});
+
+test('it handles missing invoice gracefully', function () {
+    $response = new JoFotaraResponse([]);
+
+    expect($response->getInvoiceAsXml())->toBeNull();
+});
+
+test('it handles invalid base64 invoice gracefully', function () {
+    $response = new JoFotaraResponse([
+        'submittedInvoice' => 'not-valid-base64'
+    ]);
+
+    expect($response->getInvoiceAsXml())->toBeNull();
+});
+
 test('it handles info messages correctly', function () {
     $responseData = [
         'validationResults' => [
