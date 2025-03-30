@@ -20,6 +20,7 @@ class ReasonForReturn implements ValidatableSection
     public function setReason(string $reason): self
     {
         $this->reason = $reason;
+
         return $this;
     }
 

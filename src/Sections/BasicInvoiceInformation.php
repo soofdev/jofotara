@@ -41,8 +41,11 @@ class BasicInvoiceInformation implements ValidatableSection
     private int $invoiceCounter = 1;
 
     private bool $isCreditInvoice = false;
+
     private ?string $originalInvoiceId = null;
+
     private ?string $originalInvoiceUuid = null;
+
     private ?float $originalFullAmount = null;
 
     /**
@@ -226,6 +229,7 @@ class BasicInvoiceInformation implements ValidatableSection
         $this->originalInvoiceId = $originalInvoiceId;
         $this->originalInvoiceUuid = $originalInvoiceUuid;
         $this->originalFullAmount = $originalFullAmount;
+
         return $this;
     }
 
@@ -282,9 +286,9 @@ class BasicInvoiceInformation implements ValidatableSection
         if ($this->isCreditInvoice) {
             $xml[] = '<cac:BillingReference>';
             $xml[] = '    <cac:InvoiceDocumentReference>';
-            $xml[] = '        <cbc:ID>' . $this->escapeXml($this->originalInvoiceId) . '</cbc:ID>';
-            $xml[] = '        <cbc:UUID>' . $this->escapeXml($this->originalInvoiceUuid) . '</cbc:UUID>';
-            $xml[] = '        <cbc:DocumentDescription>' . number_format($this->originalFullAmount, 2) . '</cbc:DocumentDescription>';
+            $xml[] = '        <cbc:ID>'.$this->escapeXml($this->originalInvoiceId).'</cbc:ID>';
+            $xml[] = '        <cbc:UUID>'.$this->escapeXml($this->originalInvoiceUuid).'</cbc:UUID>';
+            $xml[] = '        <cbc:DocumentDescription>'.number_format($this->originalFullAmount, 2).'</cbc:DocumentDescription>';
             $xml[] = '    </cac:InvoiceDocumentReference>';
             $xml[] = '</cac:BillingReference>';
         }

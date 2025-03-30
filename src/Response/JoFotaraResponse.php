@@ -139,10 +139,10 @@ class JoFotaraResponse
     {
         // Handle authentication errors (403)
         if ($this->statusCode === 403) {
-            return [[                
+            return [[
                 'code' => $this->rawResponse['code'] ?? 'AUTH_ERROR',
                 'message' => $this->rawResponse['error'] ?? 'Authentication failed. Please check your client ID and secret.',
-                'category' => 'Authentication'
+                'category' => 'Authentication',
             ]];
         }
 
@@ -155,23 +155,24 @@ class JoFotaraResponse
         }
 
         // For error responses with status code 400 or specific error structure
-        if (($this->statusCode === 400 || isset($this->rawResponse['error'])) && !empty($this->rawResponse)) {
+        if (($this->statusCode === 400 || isset($this->rawResponse['error'])) && ! empty($this->rawResponse)) {
             // If there's a specific error structure, use it
             if (isset($this->rawResponse['error']) || isset($this->rawResponse['errors'])) {
                 $error = isset($this->rawResponse['errors']) ? $this->rawResponse['errors'] : [[
                     'code' => $this->rawResponse['code'] ?? 'API_ERROR',
                     'message' => $this->rawResponse['error'] ?? json_encode($this->rawResponse),
-                    'category' => 'API Validation'
+                    'category' => 'API Validation',
                 ]];
+
                 return is_array($error) ? $error : [$error];
             }
 
             // If there's no specific error structure, create one from the response
-            if (!isset($this->rawResponse['validationResults']) && !isset($this->rawResponse['EINV_RESULTS'])) {
-                return [[                    
+            if (! isset($this->rawResponse['validationResults']) && ! isset($this->rawResponse['EINV_RESULTS'])) {
+                return [[
                     'code' => 'API_ERROR',
                     'message' => json_encode($this->rawResponse),
-                    'category' => 'API Validation'
+                    'category' => 'API Validation',
                 ]];
             }
         }

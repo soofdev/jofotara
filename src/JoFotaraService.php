@@ -5,13 +5,13 @@ namespace JBadarneh\JoFotara;
 use InvalidArgumentException;
 use JBadarneh\JoFotara\Response\JoFotaraResponse;
 use JBadarneh\JoFotara\Sections\BasicInvoiceInformation;
+use JBadarneh\JoFotara\Sections\BillingReference;
 use JBadarneh\JoFotara\Sections\CustomerInformation;
 use JBadarneh\JoFotara\Sections\InvoiceItems;
 use JBadarneh\JoFotara\Sections\InvoiceTotals;
+use JBadarneh\JoFotara\Sections\ReasonForReturn;
 use JBadarneh\JoFotara\Sections\SellerInformation;
 use JBadarneh\JoFotara\Sections\SupplierIncomeSource;
-use JBadarneh\JoFotara\Sections\BillingReference;
-use JBadarneh\JoFotara\Sections\ReasonForReturn;
 use RuntimeException;
 
 class JoFotaraService
@@ -353,20 +353,20 @@ class JoFotaraService
         if ($statusCode === 403) {
             return new JoFotaraResponse([
                 'error' => 'Authentication failed. Please check your client ID and secret.',
-                'code' => 'AUTH_ERROR'
+                'code' => 'AUTH_ERROR',
             ], $statusCode);
         }
 
         // Parse the response for other status codes
         $result = json_decode($response, true);
-        
+
         // For empty responses or parsing errors, provide appropriate error message
         if (empty($response) || json_last_error() !== JSON_ERROR_NONE) {
             $result = [
-                'error' => empty($response) ? 
-                    'Empty response from API' : 
+                'error' => empty($response) ?
+                    'Empty response from API' :
                     'Invalid response format from API',
-                'code' => 'RESPONSE_ERROR'
+                'code' => 'RESPONSE_ERROR',
             ];
         }
 

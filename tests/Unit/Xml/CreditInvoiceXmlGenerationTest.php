@@ -23,22 +23,22 @@ function setupCreditInvoice(): JoFotaraService
 
 test('validates credit invoice requires return reason', function () {
     $invoice = setupCreditInvoice();
-    
+
     $invoice->sellerInformation()
         ->setTin('12345678')
         ->setName('Test Seller');
-    
+
     expect(fn () => $invoice->generateXml())
         ->toThrow(InvalidArgumentException::class, 'Credit invoices require a reason for return');
 });
 
 test('generates valid credit invoice XML', function () {
     $invoice = setupCreditInvoice();
-    
+
     // Add billing reference
     // Add reason for return
     $invoice->setReasonForReturn('Defective item returned');
-    
+
     // Add seller information
     $invoice->sellerInformation()
         ->setTin('12345678')
@@ -46,12 +46,12 @@ test('generates valid credit invoice XML', function () {
 
     // Add supplier income source
     $invoice->supplierIncomeSource('1');
-    
+
     // Add customer information
     $invoice->customerInformation()
         ->setId('987654321', 'TIN')
         ->setName('Test Customer');
-    
+
     // Add items
     $invoice->items()
         ->addItem('1')
@@ -59,16 +59,16 @@ test('generates valid credit invoice XML', function () {
         ->setUnitPrice(100.0)
         ->setDescription('Test Item')
         ->tax(16);
-    
+
     // Add totals
     $invoice->invoiceTotals()
         ->setTaxExclusiveAmount(100.00)
         ->setTaxInclusiveAmount(116.00)
         ->setTaxTotalAmount(16.00)
         ->setPayableAmount(116.00);
-    
+
     $xml = $invoice->generateXml();
-    
+
     // Test credit invoice specific elements
     expect($xml)
         ->toContain('<cbc:InvoiceTypeCode name="012">381</cbc:InvoiceTypeCode>')
@@ -76,7 +76,7 @@ test('generates valid credit invoice XML', function () {
         ->toContain('<cbc:UUID>original-uuid</cbc:UUID>')
         ->toContain('<cbc:DocumentDescription>200.00</cbc:DocumentDescription>')
         ->toContain('<cbc:InstructionNote>Defective item returned</cbc:InstructionNote>');
-        
+
     // Validate against schema
     $result = $this->validateAgainstUblSchema($this->normalizeXml($xml));
     expect($result['isValid'])->toBeTrue();

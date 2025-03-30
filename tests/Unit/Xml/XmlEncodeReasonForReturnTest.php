@@ -6,7 +6,7 @@ use JBadarneh\JoFotara\Traits\XmlHelperTrait;
 uses(XmlHelperTrait::class);
 
 test('it generates exact XML structure for return reason', function () {
-    $reasonForReturn = new ReasonForReturn();
+    $reasonForReturn = new ReasonForReturn;
     $reasonForReturn->setReason('Defective item returned');
 
     $expected = $this->normalizeXml(<<<'XML'

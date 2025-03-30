@@ -84,69 +84,69 @@ echo "------------------------------\n";
 
 // This is a simulation - in production, you would use $invoice->send()
 // For demonstration, we'll create a mock response
-// $mockSuccessResponse = [
-//     'validationResults' => [
-//         'infoMessages' => [
-//             [
-//                 'type' => 'INFO',
-//                 'code' => 'XSD_VALID',
-//                 'category' => 'XSD validation',
-//                 'message' => 'Complied with UBL 2.1 standards in line with ZATCA specifications',
-//                 'status' => 'PASS',
-//             ],
-//         ],
-//         'warningMessages' => [],
-//         'errorMessages' => [],
-//         'status' => 'PASS',
-//     ],
-//     'invoiceStatus' => 'SUBMITTED',
-//     'submittedInvoice' => $encodedInvoice,
-//     'qrCode' => 'qrcodedata',
-//     'invoiceNumber' => $configs['invoice_id'],
-//     'invoiceUUID' => $configs['uuid'],
-// ];
+$mockSuccessResponse = [
+    'validationResults' => [
+        'infoMessages' => [
+            [
+                'type' => 'INFO',
+                'code' => 'XSD_VALID',
+                'category' => 'XSD validation',
+                'message' => 'Complied with UBL 2.1 standards in line with ZATCA specifications',
+                'status' => 'PASS',
+            ],
+        ],
+        'warningMessages' => [],
+        'errorMessages' => [],
+        'status' => 'PASS',
+    ],
+    'invoiceStatus' => 'SUBMITTED',
+    'submittedInvoice' => $encodedInvoice,
+    'qrCode' => 'qrcodedata',
+    'invoiceNumber' => $configs['invoice_id'],
+    'invoiceUUID' => $configs['uuid'],
+];
 
-// // // Create a response object from the mock data
-// $response = new \JBadarneh\JoFotara\Response\JoFotaraResponse($mockSuccessResponse);
+// // Create a response object from the mock data
+$response = new \JBadarneh\JoFotara\Response\JoFotaraResponse($mockSuccessResponse);
 
-// // Demonstrate how to use the response object
-// echo "\nResponse Handling Example:\n";
-// echo "---------------------------\n";
+// Demonstrate how to use the response object
+echo "\nResponse Handling Example:\n";
+echo "---------------------------\n";
 
-// echo 'Is Success: '.($response->isSuccess() ? 'Yes' : 'No')."\n";
-// echo 'Invoice Status: '.$response->getInvoiceStatus()."\n";
-// echo 'Invoice Number: '.$response->getInvoiceNumber()."\n";
-// echo 'Invoice UUID: '.$response->getInvoiceUuid()."\n";
-// echo 'QR Code: '.$response->getQrCode()."\n";
+echo 'Is Success: '.($response->isSuccess() ? 'Yes' : 'No')."\n";
+echo 'Invoice Status: '.$response->getInvoiceStatus()."\n";
+echo 'Invoice Number: '.$response->getInvoiceNumber()."\n";
+echo 'Invoice UUID: '.$response->getInvoiceUuid()."\n";
+echo 'QR Code: '.$response->getQrCode()."\n";
 
-// // Check for errors
-// if ($response->hasErrors()) {
-//     echo "\nErrors:\n";
-//     echo $response->getErrorSummary()."\n";
-// } else {
-//     echo "\nNo errors found.\n";
-// }
-
-// // Check for warnings
-// if ($response->hasWarnings()) {
-//     echo "\nWarnings:\n";
-//     foreach ($response->getWarnings() as $warning) {
-//         $code = $warning['code'] ?? $warning['EINV_CODE'] ?? 'UNKNOWN';
-//         $message = $warning['message'] ?? $warning['EINV_MESSAGE'] ?? 'Unknown warning';
-//         echo "[{$code}] {$message}\n";
-//     }
-// } else {
-//     echo "\nNo warnings found.\n";
-// }
-
-//In a real application, you would use:
-
-$response = $invoice->send();
-
-if ($response->isSuccess()) {
-    echo "Invoice successfully submitted!\n";
-    echo 'Invoice UUID: '.$response->getInvoiceUuid()."\n";
-} else {
-    echo "Invoice submission failed:\n";
+// Check for errors
+if ($response->hasErrors()) {
+    echo "\nErrors:\n";
     echo $response->getErrorSummary()."\n";
+} else {
+    echo "\nNo errors found.\n";
 }
+
+// Check for warnings
+if ($response->hasWarnings()) {
+    echo "\nWarnings:\n";
+    foreach ($response->getWarnings() as $warning) {
+        $code = $warning['code'] ?? $warning['EINV_CODE'] ?? 'UNKNOWN';
+        $message = $warning['message'] ?? $warning['EINV_MESSAGE'] ?? 'Unknown warning';
+        echo "[{$code}] {$message}\n";
+    }
+} else {
+    echo "\nNo warnings found.\n";
+}
+
+// In a real application, you would use:
+
+// $response = $invoice->send();
+
+// if ($response->isSuccess()) {
+//     echo "Invoice successfully submitted!\n";
+//     echo 'Invoice UUID: '.$response->getInvoiceUuid()."\n";
+// } else {
+//     echo "Invoice submission failed:\n";
+//     echo $response->getErrorSummary()."\n";
+// }
