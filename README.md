@@ -1,81 +1,199 @@
-# PHP SDK for Jordan E-Invoice Portal (JoFotara)
+# JoFotara SDK - Jordan E-Invoice Integration
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/jafar-albadarneh/jofotara.svg?style=flat-square)](https://packagist.org/packages/jafar-albadarneh/jofotara)
 [![Tests](https://img.shields.io/github/actions/workflow/status/jafar-albadarneh/jofotara/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/jafar-albadarneh/jofotara/actions/workflows/run-tests.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/jafar-albadarneh/jofotara.svg?style=flat-square)](https://packagist.org/packages/jafar-albadarneh/jofotara)
 
-A developer-friendly PHP SDK for seamless integration with Jordan's e-invoicing system (JoFotara). This package handles XML generation, validation, and API communication with a fluent, intuitive interface.
+A powerful, developer-friendly PHP SDK for seamless integration with Jordan's electronic tax invoicing system (JoFotara). This package provides:
 
-## Quick Start
+- 🚀 **Simple, Fluent API**: Intuitive builder pattern for creating invoices
+- ✅ **Full UBL 2.1 Compliance**: Generates valid XML according to Jordan Tax Authority standards
+- 🔒 **Built-in Validation**: Ensures all required fields and business rules are satisfied
+- 🔄 **Multiple Invoice Types**: Support for sales, income, credit invoices, and more
+- 💳 **Flexible Payment Methods**: Handle both cash and receivable transactions
+- 🧮 **Automatic Calculations**: Built-in tax and total calculations
+
+## 📦 Installation
+
+```bash
+composer require jafar-albadarneh/jofotara
+```
+
+## 🚀 Quick Start
 
 ```php
 use JBadarneh\JoFotara\JoFotaraService;
 
 $invoice = new JoFotaraService('your-client-id', 'your-client-secret');
 
-// Set basic invoice information
+// Create a basic sales invoice
 $invoice->basicInformation()
     ->setInvoiceId('INV-001')
     ->setUuid('123e4567-e89b-12d3-a456-426614174000')
     ->setIssueDate('16-02-2025')
-    ->cash();  // or ->receivable()
- 
-// Set seller information
+    ->setInvoiceType('general_sales')
+    ->cash();
+
 $invoice->sellerInformation()
     ->setName('Your Company')
     ->setTin('123456789');
-    
-// Set buyer information
-$invoice->buyerInformation()
-    ->setId('987654321', 'TIN')
-    ->setName('Customer Name')
-    ->setPostalCode('11937')
-    ->setCityCode('JO-IR')
-    ->setPhone('0791234567')
-    ->setTin('987654321');
-    
-// Set Supplier Income Source
-$invoice->supplierIncomeSource('123456789');
 
-// Add items with automatic tax calculation
+$invoice->customerInformation()
+    ->setId('987654321', 'TIN')
+    ->setName('Customer Name');
+
 $invoice->items()
     ->addItem('1')
     ->setQuantity(2)
     ->setUnitPrice(100.0)
     ->setDescription('Premium Widget')
-    ->tax(16);  // 16% VAT
+    ->tax(16);
 
-// Send to JoFotara
 $response = $invoice->send();
 ```
 
-## Installation
+## 📖 Documentation
 
-Install the package via composer:
+### Invoice Types
 
-```bash
-composer require jafar-albadarneh/jofotara
+The SDK supports all JoFotara invoice types:
+
+```php
+// 1. General Sales Invoice
+$invoice->basicInformation()
+    ->setInvoiceType('general_sales')
+    ->cash();  // or ->receivable()
+
+// 2. Special Sales Invoice (e.g., exports)
+$invoice->basicInformation()
+    ->setInvoiceType('special_sales')
+    ->cash();
+
+// 3. Income Invoice
+$invoice->basicInformation()
+    ->setInvoiceType('income')
+    ->cash();
+
+// 4. Credit Invoice (for returns/corrections)
+$invoice->basicInformation()
+    ->setInvoiceType('general_sales')
+    ->cash()
+    ->asCreditInvoice(
+        originalInvoiceId: 'INV-001',
+        originalInvoiceUuid: '123e4567-...',
+        originalFullAmount: 200.00
+    );
+
+// Set reason for credit invoice
+$invoice->setReasonForReturn('Defective item returned');
 ```
 
-## Testing the API
+### Payment Methods
 
-**Important Note**: JoFotara does not provide a sandbox environment. To test the integration:
+JoFotara supports two payment methods:
 
-1. You must have a registered entity with the Jordan Tax Department (valid tax ID required)
-2. Your entity needs to be registered for JoFotara (with username/password)
-3. During testing, use past dates for invoice issuance to avoid being taxed for test invoices
+```php
+// 1. Cash Payment (code: 012)
+$invoice->basicInformation()
+    ->setInvoiceType('general_sales')
+    ->cash();
 
-### Generate Test Invoice
+// 2. Receivable Payment (code: 022)
+$invoice->basicInformation()
+    ->setInvoiceType('general_sales')
+    ->receivable();
+```
 
-The package includes an example script to help you generate and test invoices. You can find it at `examples/GenerateGeneralInvoice.php`. This script generates a base64 encoded invoice string that can be used directly in the REST API body.
+### Tax Handling
 
-On macOS, you can copy the generated invoice directly to your clipboard:
+The SDK supports various tax scenarios:
+
+```php
+// 1. Standard VAT (16%)
+$invoice->items()
+    ->addItem('1')
+    ->setQuantity(1)
+    ->setUnitPrice(100.0)
+    ->tax(16);
+
+// 2. Tax Exempt
+$invoice->items()
+    ->addItem('2')
+    ->setQuantity(1)
+    ->setUnitPrice(50.0)
+    ->taxExempted();
+
+// 3. Zero-rated (e.g., exports)
+$invoice->items()
+    ->addItem('3')
+    ->setQuantity(1)
+    ->setUnitPrice(75.0)
+    ->zeroTax();
+
+// 4. Item with Discount
+$invoice->items()
+    ->addItem('4')
+    ->setQuantity(1)
+    ->setUnitPrice(200.0)
+    ->setDiscount(20.0)
+    ->tax(16);
+```
+
+### Response Handling
+
+```php
+$response = $invoice->send();
+
+if ($response->isSuccessful()) {
+    // Invoice accepted
+    $data = $response->getData();
+    echo "Invoice ID: {$data['invoice_id']}\n";
+    echo "Status: {$data['status']}\n";
+} else {
+    // Handle errors
+    foreach ($response->getErrors() as $error) {
+        echo "Error: {$error['message']}\n";
+    }
+}
+```
+
+## 🧪 Testing
+
+**Important**: JoFotara does not provide a sandbox environment. For testing:
+
+1. You need a registered entity with Jordan Tax Department
+2. Your entity must be registered for JoFotara
+3. Use past dates for test invoices
+4. Always issue credit invoices to reverse test transactions
+
+### Running Tests
 
 ```bash
+# Run the test suite
+composer test
+
+# Generate a test invoice
+php examples/GenerateGeneralInvoice.php
+
+# On macOS, copy to clipboard
 php examples/GenerateGeneralInvoice.php | pbcopy
 ```
 
-## Detailed Configuration
+## 🔒 Security
+
+Never commit your JoFotara credentials to version control. Use environment variables:
+
+```php
+$invoice = new JoFotaraService(
+    clientId: getenv('JOFOTARA_CLIENT_ID'),
+    clientSecret: getenv('JOFOTARA_CLIENT_SECRET')
+);
+```
+
+## 📄 License
+
+The MIT License (MIT). Please see the [License File](LICENSE.md) for more information.
+
 
 ### Basic Invoice Information
 
@@ -109,7 +227,7 @@ $invoice->sellerInformation()
 ### Buyer Information
 
 ```php
-$invoice->buyerInformation()
+$invoice->customerInformation()
     ->setId('987654321', 'TIN')        // Required: ID and type (TIN, NIN, or PN)
     ->setName('Customer Name')          // Required for receivables
     ->setPostalCode('11937')           // Optional
@@ -146,7 +264,7 @@ $invoice->sellerInformation()
     ->setTin('123456789');
 
 // Set buyer information
-$invoice->buyerInformation()
+$invoice->customerInformation()
     ->setId('987654321', 'TIN')
     ->setName('Customer Name');
 
@@ -213,6 +331,8 @@ The SDK automatically calculates all invoice totals based on the items you add:
 - Total discounts
 - Total tax amount
 - Final payable amount
+
+Automatic calculations are applied once you call `->invoiceTotals()`. This method must be called after all items have been added.
 
 For special cases, you can manually set totals:
 

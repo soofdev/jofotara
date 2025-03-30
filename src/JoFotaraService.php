@@ -8,6 +8,7 @@ use JBadarneh\JoFotara\Sections\BasicInvoiceInformation;
 use JBadarneh\JoFotara\Sections\CustomerInformation;
 use JBadarneh\JoFotara\Sections\InvoiceItems;
 use JBadarneh\JoFotara\Sections\InvoiceTotals;
+use JBadarneh\JoFotara\Sections\ReasonForReturn;
 use JBadarneh\JoFotara\Sections\SellerInformation;
 use JBadarneh\JoFotara\Sections\SupplierIncomeSource;
 use RuntimeException;
@@ -27,6 +28,10 @@ class JoFotaraService
     private ?InvoiceItems $items = null;
 
     private ?InvoiceTotals $invoiceTotals = null;
+
+    private ?BillingReference $billingReference = null;
+
+    private ?ReasonForReturn $reasonForReturn = null;
 
     private string $clientId;
 
@@ -100,6 +105,34 @@ class JoFotaraService
     }
 
     /**
+     * Get the billing reference section builder
+     */
+    public function billingReference(): BillingReference
+    {
+        if (! $this->billingReference) {
+            $this->billingReference = new BillingReference;
+        }
+
+        return $this->billingReference;
+    }
+
+    /**
+     * Set the reason for return
+     *
+     * @param  string  $reason  The reason for returning the invoice
+     */
+    public function setReasonForReturn(string $reason): self
+    {
+        if (! $this->reasonForReturn) {
+            $this->reasonForReturn = new ReasonForReturn;
+        }
+
+        $this->reasonForReturn->setReason($reason);
+
+        return $this;
+    }
+
+    /**
      * Get the monetary totals section builder
      */
     public function invoiceTotals(): InvoiceTotals
@@ -141,6 +174,17 @@ class JoFotaraService
      */
     private function validateSections(): void
     {
+        // Validate basic information first
+        $this->basicInfo->validateSection();
+
+        // Validate credit invoice requirements before other validations
+        if ($this->basicInfo->isCreditInvoice()) {
+            if (empty($this->reasonForReturn)) {
+                throw new InvalidArgumentException('Credit invoices require a reason for return');
+            }
+            $this->reasonForReturn->validateSection();
+        }
+
         // Validate all required sections are initialized
         if (! $this->sellerInfo) {
             throw new InvalidArgumentException('Seller information is required');
@@ -157,7 +201,6 @@ class JoFotaraService
         }
 
         // Validate each section individually
-        $this->basicInfo->validateSection();
         $this->sellerInfo->validateSection();
         // Validate customer information if set
         if ($this->customerInfo) {
@@ -237,6 +280,11 @@ class JoFotaraService
             $xml[] = $this->supplierIncomeSource->toXml();
         }
 
+        // Add reason for return for credit invoices
+        if ($this->basicInfo->isCreditInvoice() && $this->reasonForReturn) {
+            $xml[] = $this->reasonForReturn->toXml();
+        }
+
         // Add invoice totals
         $xml[] = $this->invoiceTotals->toXml();
 
@@ -300,18 +348,33 @@ class JoFotaraService
             throw new RuntimeException('Failed to send invoice: '.$error);
         }
 
-        // Parse the response even if status code is not 200
-        $result = json_decode($response, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new RuntimeException('Failed to parse API response');
+        // For 403 responses, create a response object with authentication error
+        if ($statusCode === 403) {
+            return new JoFotaraResponse([
+                'error' => 'Authentication failed. Please check your client ID and secret.',
+                'code' => 'AUTH_ERROR',
+            ], $statusCode);
         }
 
-        // Handle both 200 and 400 responses with the JoFotaraResponse object
-        if ($statusCode !== 200 && $statusCode !== 400) {
+        // Parse the response for other status codes
+        $result = json_decode($response, true);
+
+        // For empty responses or parsing errors, provide appropriate error message
+        if (empty($response) || json_last_error() !== JSON_ERROR_NONE) {
+            $result = [
+                'error' => empty($response) ?
+                    'Empty response from API' :
+                    'Invalid response format from API',
+                'code' => 'RESPONSE_ERROR',
+            ];
+        }
+
+        // Handle 200 and 400 responses with the JoFotaraResponse object
+        if ($statusCode !== 200 && $statusCode !== 400 && $statusCode !== 403) {
             throw new RuntimeException('API request failed with status code '.$statusCode);
         }
 
-        // Create a response object that can handle both success and error responses
+        // Create a response object that can handle success, error, and auth failure responses
         return new JoFotaraResponse($result, $statusCode);
     }
 }

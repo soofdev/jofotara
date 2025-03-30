@@ -137,6 +137,15 @@ class JoFotaraResponse
      */
     public function getErrors(): array
     {
+        // Handle authentication errors (403)
+        if ($this->statusCode === 403) {
+            return [[
+                'code' => $this->rawResponse['code'] ?? 'AUTH_ERROR',
+                'message' => $this->rawResponse['error'] ?? 'Authentication failed. Please check your client ID and secret.',
+                'category' => 'Authentication',
+            ]];
+        }
+
         if (isset($this->rawResponse['validationResults']['errorMessages'])) {
             return $this->rawResponse['validationResults']['errorMessages'];
         }
@@ -145,11 +154,17 @@ class JoFotaraResponse
             return $this->rawResponse['EINV_RESULTS']['ERRORS'];
         }
 
-        // For error responses with status code 400, the entire response might be the error
-        if ($this->statusCode === 400 && ! empty($this->rawResponse)) {
+        // For error responses with status code 400 or specific error structure
+        if (($this->statusCode === 400 || isset($this->rawResponse['error'])) && ! empty($this->rawResponse)) {
             // If there's a specific error structure, use it
             if (isset($this->rawResponse['error']) || isset($this->rawResponse['errors'])) {
-                return isset($this->rawResponse['errors']) ? $this->rawResponse['errors'] : [$this->rawResponse['error']];
+                $error = isset($this->rawResponse['errors']) ? $this->rawResponse['errors'] : [[
+                    'code' => $this->rawResponse['code'] ?? 'API_ERROR',
+                    'message' => $this->rawResponse['error'] ?? json_encode($this->rawResponse),
+                    'category' => 'API Validation',
+                ]];
+
+                return is_array($error) ? $error : [$error];
             }
 
             // If there's no specific error structure, create one from the response
