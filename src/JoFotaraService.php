@@ -5,7 +5,6 @@ namespace JBadarneh\JoFotara;
 use InvalidArgumentException;
 use JBadarneh\JoFotara\Response\JoFotaraResponse;
 use JBadarneh\JoFotara\Sections\BasicInvoiceInformation;
-use JBadarneh\JoFotara\Sections\BillingReference;
 use JBadarneh\JoFotara\Sections\CustomerInformation;
 use JBadarneh\JoFotara\Sections\InvoiceItems;
 use JBadarneh\JoFotara\Sections\InvoiceTotals;
