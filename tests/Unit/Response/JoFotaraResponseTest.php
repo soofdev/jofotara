@@ -99,7 +99,7 @@ test('it decodes base64 invoice to XML correctly', function () {
     $base64Invoice = base64_encode($xmlContent);
 
     $response = new JoFotaraResponse([
-        'submittedInvoice' => $base64Invoice
+        'submittedInvoice' => $base64Invoice,
     ]);
 
     expect($response->getInvoiceAsXml())->toBe($xmlContent);
@@ -113,7 +113,7 @@ test('it handles missing invoice gracefully', function () {
 
 test('it handles invalid base64 invoice gracefully', function () {
     $response = new JoFotaraResponse([
-        'submittedInvoice' => 'not-valid-base64'
+        'submittedInvoice' => 'not-valid-base64',
     ]);
 
     expect($response->getInvoiceAsXml())->toBeNull();
