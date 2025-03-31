@@ -75,6 +75,7 @@ class JoFotaraService
     {
         if (! $this->customerInfo) {
             $this->customerInfo = new CustomerInformation;
+            $this->customerInfo->setId('', 'NIN');
         }
 
         return $this->customerInfo;
@@ -188,6 +189,12 @@ class JoFotaraService
         // Validate all required sections are initialized
         if (! $this->sellerInfo) {
             throw new InvalidArgumentException('Seller information is required');
+        }
+
+        // Validate customer information is initialized
+        if (! $this->customerInfo) {
+            $this->customerInfo = new CustomerInformation;
+            $this->customerInfo->setupAnonymousCustomer();
         }
 
         if (! $this->supplierIncomeSource) {

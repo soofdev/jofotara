@@ -126,6 +126,18 @@ class CustomerInformation implements ValidatableSection
     }
 
     /**
+     * Set up an anonymous customer with NIN type
+     * This ensures the customer section exists in the XML but with empty values
+     */
+    public function setupAnonymousCustomer(): self
+    {
+        $this->idType = 'NIN';
+        $this->id = '';
+
+        return $this;
+    }
+
+    /**
      * Convert the customer information to XML
      *
      * @return string The XML representation of the customer information
@@ -136,15 +148,13 @@ class CustomerInformation implements ValidatableSection
         $xml[] = '<cac:AccountingCustomerParty>';
         $xml[] = '    <cac:Party>';
 
-        // Customer identification
-        if ($this->id !== null && $this->idType !== null) {
-            $xml[] = '        <cac:PartyIdentification>';
-            $xml[] = sprintf('            <cbc:ID schemeID="%s">%s</cbc:ID>',
-                $this->escapeXml($this->idType),
-                $this->escapeXml($this->id)
-            );
-            $xml[] = '        </cac:PartyIdentification>';
-        }
+        // Customer identification - always include with empty values if not set
+        $xml[] = '        <cac:PartyIdentification>';
+        $xml[] = sprintf('            <cbc:ID schemeID="%s">%s</cbc:ID>',
+            $this->escapeXml($this->idType ?? 'NIN'),
+            $this->escapeXml($this->id ?? '')
+        );
+        $xml[] = '        </cac:PartyIdentification>';
 
         // Postal address
         if ($this->postalCode !== null || $this->cityCode !== null) {
@@ -236,19 +246,9 @@ class CustomerInformation implements ValidatableSection
             throw new InvalidArgumentException('Invalid customer ID type. Must be NIN, PN, or TIN');
         }
 
-        // Validate ID is not empty
-        if (empty(trim($this->id))) {
-            throw new InvalidArgumentException('Customer ID cannot be empty');
-        }
-
         // Validate city code if set
         if ($this->cityCode !== null && ! in_array($this->cityCode, self::VALID_CITY_CODES)) {
             throw new InvalidArgumentException('Invalid city code');
-        }
-
-        // Validate phone format if set
-        if ($this->phone !== null && ! preg_match('/^07[789]\d{7}$/', $this->phone)) {
-            throw new InvalidArgumentException('Invalid phone number format. Must be a valid Jordanian mobile number');
         }
     }
 }

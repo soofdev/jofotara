@@ -99,30 +99,6 @@ test('throws exception when customer information is invalid', function () {
         ->toThrow(InvalidArgumentException::class, 'City code must be one of: JO-BA, JO-MN, JO-MD, JO-MA, JO-KA, JO-JA, JO-IR, JO-AZ, JO-AT, JO-AQ, JO-AM, JO-AJ');
 });
 
-test('it should omit the customer information section if not configured as part of the invoice', function () {
-    $invoice = setupBasicInvoice();
-
-    // Add all other required sections
-    $invoice->sellerInformation()
-        ->setName('Seller Company')
-        ->setTin('12345678');
-
-    $invoice->supplierIncomeSource('12345678');
-
-    $invoice->items()
-        ->addItem('1')
-        ->setQuantity(1)
-        ->setUnitPrice(100.0)
-        ->setDescription('Test Item')
-        ->tax(16);
-
-    $invoice->invoiceTotals();
-
-    $xml = $invoice->generateXml();
-
-    expect($xml)->not()->toContain('cac:AccountingCustomerParty');
-});
-
 test('throws exception when invoice items are missing', function () {
     $invoice = setupBasicInvoice();
 
@@ -512,4 +488,63 @@ test('it auto-calculates invoice totals correctly', function () {
         ->and($xml)->toContain('<cbc:TaxExclusiveAmount currencyID="JOD">100.00</cbc:TaxExclusiveAmount>')
         ->and($xml)->toContain('<cbc:TaxInclusiveAmount currencyID="JOD">116.00</cbc:TaxInclusiveAmount>')
         ->and($xml)->toContain('<cbc:PayableAmount currencyID="JOD">116.00</cbc:PayableAmount>');
+});
+
+test('it should include customer information section with empty values when setupAnonymousCustomer is called', function () {
+    $invoice = setupBasicInvoice();
+
+    // Add all other required sections
+    $invoice->sellerInformation()
+        ->setName('Seller Company')
+        ->setTin('12345678');
+
+    $invoice->supplierIncomeSource('12345678');
+
+    $invoice->items()
+        ->addItem('1')
+        ->setQuantity(1)
+        ->setUnitPrice(100.0)
+        ->setDescription('Test Item')
+        ->tax(16);
+
+    $invoice->invoiceTotals();
+
+    // Set up anonymous customer
+    $invoice->customerInformation()->setupAnonymousCustomer();
+
+    $xml = $invoice->generateXml();
+
+    // Verify customer section exists with empty values
+    expect($xml)->toContain('cac:AccountingCustomerParty')
+        ->and($xml)->toContain('<cbc:ID schemeID="NIN"></cbc:ID>')
+        ->and($xml)->toContain('<cac:PostalAddress>')
+        ->and($xml)->toContain('<cac:PartyLegalEntity>')
+        ->and($xml)->toContain('<cac:PartyIdentification>');
+});
+
+test('it should include customer information section with empty values customerSection is not called', function () {
+    $invoice = setupBasicInvoice();
+
+    // Add all other required sections
+    $invoice->sellerInformation()
+        ->setName('Seller Company')
+        ->setTin('12345678');
+
+    $invoice->supplierIncomeSource('12345678');
+
+    $invoice->items()
+        ->addItem('1')
+        ->setQuantity(1)
+        ->setUnitPrice(100.0)
+        ->setDescription('Test Item')
+        ->tax(16);
+
+    $invoice->invoiceTotals();
+
+    $xml = $invoice->generateXml();
+
+    // Verify customer section exists with empty values
+    expect($xml)->toContain('cac:AccountingCustomerParty')
+        ->and($xml)->toContain('<cac:PartyIdentification>')
+        ->and($xml)->toContain('<cbc:ID schemeID="NIN"></cbc:ID>');
 });
