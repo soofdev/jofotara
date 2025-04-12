@@ -150,9 +150,8 @@ test('it calculates tax exclusive amount correctly', function () {
         ->setQuantity(2)
         ->setUnitPrice(100)
         ->setDiscount(20);
-
-    // (2 * 100) - 20 = 180
-    expect($item->getTaxExclusiveAmount())->toBe(180.0);
+    // (2 * 100) = 200
+    expect($item->getAmountBeforeDiscount())->toBe(200.0);
 });
 
 test('it calculates tax amount correctly for different tax categories', function () {
@@ -204,10 +203,10 @@ test('it throws exception when calculating amounts without required fields', fun
     $items = new InvoiceItems;
     $item = $items->addItem('1');
 
-    expect(fn () => $item->getTaxExclusiveAmount())
+    expect(fn () => $item->getAmountBeforeDiscount())
         ->toThrow(InvalidArgumentException::class, 'Quantity is required to calculate tax exclusive amount');
 
     $item->setQuantity(1);
-    expect(fn () => $item->getTaxExclusiveAmount())
+    expect(fn () => $item->getAmountBeforeDiscount())
         ->toThrow(InvalidArgumentException::class, 'Unit price is required to calculate tax exclusive amount');
 });

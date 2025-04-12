@@ -15,7 +15,7 @@ use RuntimeException;
 
 class JoFotaraService
 {
-    private const string API_URL = 'https://backend.jofotara.gov.jo/core/invoices/';
+    private const API_URL = 'https://backend.jofotara.gov.jo/core/invoices/';
 
     private BasicInvoiceInformation $basicInfo;
 
@@ -28,8 +28,6 @@ class JoFotaraService
     private ?InvoiceItems $items = null;
 
     private ?InvoiceTotals $invoiceTotals = null;
-
-    private ?BillingReference $billingReference = null;
 
     private ?ReasonForReturn $reasonForReturn = null;
 
@@ -106,18 +104,6 @@ class JoFotaraService
     }
 
     /**
-     * Get the billing reference section builder
-     */
-    public function billingReference(): BillingReference
-    {
-        if (! $this->billingReference) {
-            $this->billingReference = new BillingReference;
-        }
-
-        return $this->billingReference;
-    }
-
-    /**
      * Set the reason for return
      *
      * @param  string  $reason  The reason for returning the invoice
@@ -143,24 +129,24 @@ class JoFotaraService
 
             // If we have items, calculate totals from them
             if ($this->items && count($this->items->getItems()) > 0) {
-                $taxExclusiveAmount = 0.0;
-                $taxTotalAmount = 0.0;
+                $amountBeforeDiscount = 0.0;
+                $totalTaxAmount = 0.0;
                 $discountTotalAmount = 0.0;
 
                 foreach ($this->items->getItems() as $item) {
-                    $taxExclusiveAmount += $item->getTaxExclusiveAmount();
-                    $taxTotalAmount += $item->getTaxAmount();
+                    $amountBeforeDiscount += $item->getAmountBeforeDiscount();
+                    $totalTaxAmount += $item->getTaxAmount();
                     $discountTotalAmount += $item->getDiscount();
                 }
 
-                $taxInclusiveAmount = $taxExclusiveAmount + $taxTotalAmount;
-                $payableAmount = $taxInclusiveAmount - $discountTotalAmount;
+                $taxInclusiveAmount = $amountBeforeDiscount + $totalTaxAmount - $discountTotalAmount;
+                $payableAmount = $taxInclusiveAmount;
 
                 $this->invoiceTotals
-                    ->setTaxExclusiveAmount($taxExclusiveAmount)
-                    ->setTaxInclusiveAmount($taxInclusiveAmount)
+                    ->setTaxExclusiveAmount($amountBeforeDiscount)
                     ->setDiscountTotalAmount($discountTotalAmount)
-                    ->setTaxTotalAmount($taxTotalAmount)
+                    ->setTaxInclusiveAmount($taxInclusiveAmount)
+                    ->setTaxTotalAmount($totalTaxAmount)
                     ->setPayableAmount($payableAmount);
             }
         }
@@ -223,21 +209,21 @@ class JoFotaraService
             if (count($items) > 0) {
                 $calculatedTotals = new InvoiceTotals;
 
-                $taxExclusiveAmount = 0.0;
+                $amountBeforeDiscount = 0.0;
                 $taxTotalAmount = 0.0;
                 $discountTotalAmount = 0.0;
 
                 foreach ($items as $item) {
-                    $taxExclusiveAmount += $item->getTaxExclusiveAmount();
+                    $amountBeforeDiscount += $item->getAmountBeforeDiscount();
                     $taxTotalAmount += $item->getTaxAmount();
                     $discountTotalAmount += $item->getDiscount();
                 }
 
-                $taxInclusiveAmount = $taxExclusiveAmount + $taxTotalAmount;
-                $payableAmount = $taxInclusiveAmount - $discountTotalAmount;
+                $taxInclusiveAmount = $amountBeforeDiscount - $discountTotalAmount + $taxTotalAmount;
+                $payableAmount = $taxInclusiveAmount;
 
                 $calculatedTotals
-                    ->setTaxExclusiveAmount($taxExclusiveAmount)
+                    ->setTaxExclusiveAmount($amountBeforeDiscount) // correct
                     ->setTaxInclusiveAmount($taxInclusiveAmount)
                     ->setDiscountTotalAmount($discountTotalAmount)
                     ->setTaxTotalAmount($taxTotalAmount)
