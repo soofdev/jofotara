@@ -171,11 +171,28 @@ class InvoiceLineItem implements ValidatableSection
     }
 
     /**
-     * Calculate the amount before tax (quantity * unit price - discount)
+     * Calculates the total amount before discount
      *
      * @throws InvalidArgumentException If quantity or unit price is not set
      */
-    public function getTaxExclusiveAmount(): float
+    public function getAmountBeforeDiscount(): float
+    {
+        if (! isset($this->quantity)) {
+            throw new InvalidArgumentException('Quantity is required to calculate tax exclusive amount');
+        }
+        if (! isset($this->unitPrice)) {
+            throw new InvalidArgumentException('Unit price is required to calculate tax exclusive amount');
+        }
+
+        return $this->quantity * $this->unitPrice;
+    }
+
+    /**
+     * Calculates the total amount before discount
+     *
+     * @throws InvalidArgumentException If quantity or unit price is not set
+     */
+    public function getAmountAfterDiscount(): float
     {
         if (! isset($this->quantity)) {
             throw new InvalidArgumentException('Quantity is required to calculate tax exclusive amount');
@@ -194,9 +211,9 @@ class InvoiceLineItem implements ValidatableSection
      */
     public function getTaxAmount(): float
     {
-        $taxExclusiveAmount = $this->getTaxExclusiveAmount();
+        $amountAfterDiscount = $this->getAmountAfterDiscount();
 
-        return $this->taxCategory === 'S' ? $taxExclusiveAmount * ($this->taxPercent / 100) : 0;
+        return $this->taxCategory === 'S' ? $amountAfterDiscount * ($this->taxPercent / 100) : 0;
     }
 
     /**
@@ -206,7 +223,7 @@ class InvoiceLineItem implements ValidatableSection
      */
     public function getTaxInclusiveAmount(): float
     {
-        return $this->getTaxExclusiveAmount() + $this->getTaxAmount();
+        return $this->getAmountAfterDiscount() + $this->getTaxAmount();
     }
 
     /**
@@ -228,7 +245,7 @@ class InvoiceLineItem implements ValidatableSection
 
         $taxAmount = $this->getTaxAmount();
         $taxInclusiveAmount = $this->getTaxInclusiveAmount();
-        $taxExclusiveAmount = $this->getTaxExclusiveAmount();
+        $taxExclusiveAmount = $this->getAmountAfterDiscount();
 
         $xml = [];
         $xml[] = '<cac:InvoiceLine>';

@@ -51,7 +51,7 @@ class InvoiceTotals implements ValidatableSection
             throw new InvalidArgumentException('Tax inclusive amount cannot be negative');
         }
 
-        if ($amount < $this->taxExclusiveAmount) {
+        if ($amount < ($this->taxExclusiveAmount - $this->discountTotalAmount)) {
             throw new InvalidArgumentException('Tax inclusive amount cannot be less than tax exclusive amount');
         }
 
@@ -89,21 +89,21 @@ class InvoiceTotals implements ValidatableSection
     /**
      * Set the total tax amount
      *
-     * @param  float  $amount  The total tax amount
+     * @param  float  $taxAmount  The total tax amount
      *
      * @throws InvalidArgumentException If amount is negative or if it makes tax inclusive amount invalid
      */
-    public function setTaxTotalAmount(float $amount): self
+    public function setTaxTotalAmount(float $taxAmount): self
     {
-        if ($amount < 0) {
+        if ($taxAmount < 0) {
             throw new InvalidArgumentException('Tax total amount cannot be negative');
         }
 
-        if ($this->taxInclusiveAmount > 0 && ($this->taxExclusiveAmount + $amount) > $this->taxInclusiveAmount) {
+        if ($this->taxInclusiveAmount > 0 && ($this->taxExclusiveAmount - $this->discountTotalAmount + $taxAmount) > $this->taxInclusiveAmount) {
             throw new InvalidArgumentException('Tax total amount would make tax inclusive amount invalid');
         }
 
-        $this->taxTotalAmount = $amount;
+        $this->taxTotalAmount = $taxAmount;
 
         return $this;
     }
