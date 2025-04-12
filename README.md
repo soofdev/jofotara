@@ -339,10 +339,10 @@ For special cases, you can manually set totals:
 ```php
 $invoice->invoiceTotals()
     ->setTaxExclusiveAmount(100.0)
-    ->setTaxInclusiveAmount(116.0)
+    ->setTaxInclusiveAmount(92.8)
     ->setDiscountTotalAmount(20.0)
-    ->setTaxTotalAmount(16.0)
-    ->setPayableAmount(96.0);
+    ->setTaxTotalAmount(12.8)
+    ->setPayableAmount(92.8);
 ```
 
 > **Note**: When manually setting totals, they must match the calculated values from the items, or an exception will be thrown to ensure data integrity.
