@@ -17,16 +17,16 @@ test('it generates exact XML structure for standard rate item', function () {
     $expected = $this->normalizeXml(<<<'XML'
 <cac:InvoiceLine>
     <cbc:ID>1</cbc:ID>
-    <cbc:InvoicedQuantity unitCode="PCE">33.00</cbc:InvoicedQuantity>
-    <cbc:LineExtensionAmount currencyID="JOD">64.00</cbc:LineExtensionAmount>
+    <cbc:InvoicedQuantity unitCode="PCE">33.000</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="JOD">64.000</cbc:LineExtensionAmount>
     <cac:TaxTotal>
-        <cbc:TaxAmount currencyID="JOD">4.48</cbc:TaxAmount>
-        <cbc:RoundingAmount currencyID="JOD">68.48</cbc:RoundingAmount>
+        <cbc:TaxAmount currencyID="JOD">4.480</cbc:TaxAmount>
+        <cbc:RoundingAmount currencyID="JOD">68.480</cbc:RoundingAmount>
         <cac:TaxSubtotal>
-            <cbc:TaxAmount currencyID="JOD">4.48</cbc:TaxAmount>
+            <cbc:TaxAmount currencyID="JOD">4.480</cbc:TaxAmount>
             <cac:TaxCategory>
                 <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5305">S</cbc:ID>
-                <cbc:Percent>7.00</cbc:Percent>
+                <cbc:Percent>7.000</cbc:Percent>
                 <cac:TaxScheme>
                     <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5153">VAT</cbc:ID>
                 </cac:TaxScheme>
@@ -37,11 +37,11 @@ test('it generates exact XML structure for standard rate item', function () {
         <cbc:Name>Biscuit</cbc:Name>
     </cac:Item>
     <cac:Price>
-        <cbc:PriceAmount currencyID="JOD">2.00</cbc:PriceAmount>
+        <cbc:PriceAmount currencyID="JOD">2.000</cbc:PriceAmount>
         <cac:AllowanceCharge>
             <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
             <cbc:AllowanceChargeReason>DISCOUNT</cbc:AllowanceChargeReason>
-            <cbc:Amount currencyID="JOD">2.00</cbc:Amount>
+            <cbc:Amount currencyID="JOD">2.000</cbc:Amount>
         </cac:AllowanceCharge>
     </cac:Price>
 </cac:InvoiceLine>
@@ -62,16 +62,16 @@ test('it generates exact XML structure for tax exempted item', function () {
     $expected = $this->normalizeXml(<<<'XML'
 <cac:InvoiceLine>
     <cbc:ID>2</cbc:ID>
-    <cbc:InvoicedQuantity unitCode="PCE">10.00</cbc:InvoicedQuantity>
-    <cbc:LineExtensionAmount currencyID="JOD">50.00</cbc:LineExtensionAmount>
+    <cbc:InvoicedQuantity unitCode="PCE">10.000</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="JOD">50.000</cbc:LineExtensionAmount>
     <cac:TaxTotal>
-        <cbc:TaxAmount currencyID="JOD">0.00</cbc:TaxAmount>
-        <cbc:RoundingAmount currencyID="JOD">50.00</cbc:RoundingAmount>
+        <cbc:TaxAmount currencyID="JOD">0.000</cbc:TaxAmount>
+        <cbc:RoundingAmount currencyID="JOD">50.000</cbc:RoundingAmount>
         <cac:TaxSubtotal>
-            <cbc:TaxAmount currencyID="JOD">0.00</cbc:TaxAmount>
+            <cbc:TaxAmount currencyID="JOD">0.000</cbc:TaxAmount>
             <cac:TaxCategory>
                 <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5305">Z</cbc:ID>
-                <cbc:Percent>0.00</cbc:Percent>
+                <cbc:Percent>0.000</cbc:Percent>
                 <cac:TaxScheme>
                     <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5153">VAT</cbc:ID>
                 </cac:TaxScheme>
@@ -82,11 +82,11 @@ test('it generates exact XML structure for tax exempted item', function () {
         <cbc:Name>Chocolate</cbc:Name>
     </cac:Item>
     <cac:Price>
-        <cbc:PriceAmount currencyID="JOD">5.00</cbc:PriceAmount>
+        <cbc:PriceAmount currencyID="JOD">5.000</cbc:PriceAmount>
         <cac:AllowanceCharge>
             <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
             <cbc:AllowanceChargeReason>DISCOUNT</cbc:AllowanceChargeReason>
-            <cbc:Amount currencyID="JOD">0.00</cbc:Amount>
+            <cbc:Amount currencyID="JOD">0.000</cbc:Amount>
         </cac:AllowanceCharge>
     </cac:Price>
 </cac:InvoiceLine>
@@ -158,20 +158,20 @@ test('it properly escapes special characters in description', function () {
     expect($xml)->toContain('<cbc:Name>Item &amp; Special &lt; &gt; &quot; &apos; Characters</cbc:Name>');
 });
 
-test('it formats numbers with two decimal places', function () {
+test('it formats numbers with two three decimal places', function () {
     $items = new InvoiceItems;
     $items->addItem('1')
         ->setQuantity(1.5)
-        ->setUnitPrice(10.123)
+        ->setUnitPrice(10.123456789)
         ->setDescription('Test')
-        ->setDiscount(2.789);
+        ->setDiscount(2.789456789);
 
     $xml = $items->toXml();
 
     expect($xml)
-        ->toContain('<cbc:InvoicedQuantity unitCode="PCE">1.50</cbc:InvoicedQuantity>')
-        ->toContain('<cbc:PriceAmount currencyID="JOD">10.12</cbc:PriceAmount>')
-        ->toContain('<cbc:Amount currencyID="JOD">2.79</cbc:Amount>');
+        ->toContain('<cbc:InvoicedQuantity unitCode="PCE">1.500</cbc:InvoicedQuantity>')
+        ->toContain('<cbc:PriceAmount currencyID="JOD">10.123</cbc:PriceAmount>')
+        ->toContain('<cbc:Amount currencyID="JOD">2.789</cbc:Amount>');
 });
 
 test('it calculates tax and totals correctly', function () {
@@ -190,9 +190,9 @@ test('it calculates tax and totals correctly', function () {
     // Total = 180 + 28.8 = 208.8
 
     expect($xml)
-        ->toContain('<cbc:LineExtensionAmount currencyID="JOD">180.00</cbc:LineExtensionAmount>')
-        ->toContain('<cbc:TaxAmount currencyID="JOD">28.80</cbc:TaxAmount>')
-        ->toContain('<cbc:RoundingAmount currencyID="JOD">208.80</cbc:RoundingAmount>');
+        ->toContain('<cbc:LineExtensionAmount currencyID="JOD">180.000</cbc:LineExtensionAmount>')
+        ->toContain('<cbc:TaxAmount currencyID="JOD">28.800</cbc:TaxAmount>')
+        ->toContain('<cbc:RoundingAmount currencyID="JOD">208.800</cbc:RoundingAmount>');
 });
 
 test('it generates XML for standard rate item with tax and discount', function () {
@@ -207,16 +207,16 @@ test('it generates XML for standard rate item with tax and discount', function (
     $expected = $this->normalizeXml(<<<'XML'
 <cac:InvoiceLine>
     <cbc:ID>1</cbc:ID>
-    <cbc:InvoicedQuantity unitCode="PCE">33.00</cbc:InvoicedQuantity>
-    <cbc:LineExtensionAmount currencyID="JOD">64.00</cbc:LineExtensionAmount>
+    <cbc:InvoicedQuantity unitCode="PCE">33.000</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="JOD">64.000</cbc:LineExtensionAmount>
     <cac:TaxTotal>
-        <cbc:TaxAmount currencyID="JOD">4.48</cbc:TaxAmount>
-        <cbc:RoundingAmount currencyID="JOD">68.48</cbc:RoundingAmount>
+        <cbc:TaxAmount currencyID="JOD">4.480</cbc:TaxAmount>
+        <cbc:RoundingAmount currencyID="JOD">68.480</cbc:RoundingAmount>
         <cac:TaxSubtotal>
-            <cbc:TaxAmount currencyID="JOD">4.48</cbc:TaxAmount>
+            <cbc:TaxAmount currencyID="JOD">4.480</cbc:TaxAmount>
             <cac:TaxCategory>
                 <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5305">S</cbc:ID>
-                <cbc:Percent>7.00</cbc:Percent>
+                <cbc:Percent>7.000</cbc:Percent>
                 <cac:TaxScheme>
                     <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5153">VAT</cbc:ID>
                 </cac:TaxScheme>
@@ -227,11 +227,11 @@ test('it generates XML for standard rate item with tax and discount', function (
         <cbc:Name>Biscuit</cbc:Name>
     </cac:Item>
     <cac:Price>
-        <cbc:PriceAmount currencyID="JOD">2.00</cbc:PriceAmount>
+        <cbc:PriceAmount currencyID="JOD">2.000</cbc:PriceAmount>
         <cac:AllowanceCharge>
             <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
             <cbc:AllowanceChargeReason>DISCOUNT</cbc:AllowanceChargeReason>
-            <cbc:Amount currencyID="JOD">2.00</cbc:Amount>
+            <cbc:Amount currencyID="JOD">2.000</cbc:Amount>
         </cac:AllowanceCharge>
     </cac:Price>
 </cac:InvoiceLine>
@@ -254,10 +254,10 @@ test('it generates XML for standard rate item with tax but no discount', functio
     // Tax amount = 200 * 0.16 = 32
     // Tax inclusive = 200 + 32 = 232
     expect($xml)
-        ->toContain('<cbc:LineExtensionAmount currencyID="JOD">200.00</cbc:LineExtensionAmount>')
-        ->toContain('<cbc:TaxAmount currencyID="JOD">32.00</cbc:TaxAmount>')
-        ->toContain('<cbc:RoundingAmount currencyID="JOD">232.00</cbc:RoundingAmount>')
-        ->toContain('<cbc:Amount currencyID="JOD">0.00</cbc:Amount>'); // Zero discount
+        ->toContain('<cbc:LineExtensionAmount currencyID="JOD">200.000</cbc:LineExtensionAmount>')
+        ->toContain('<cbc:TaxAmount currencyID="JOD">32.000</cbc:TaxAmount>')
+        ->toContain('<cbc:RoundingAmount currencyID="JOD">232.000</cbc:RoundingAmount>')
+        ->toContain('<cbc:Amount currencyID="JOD">0.000</cbc:Amount>'); // Zero discount
 });
 
 test('it generates XML for tax exempted item with discount', function () {
@@ -275,12 +275,12 @@ test('it generates XML for tax exempted item with discount', function () {
     // Tax amount = 0 (exempted)
     // Tax inclusive = 150
     expect($xml)
-        ->toContain('<cbc:LineExtensionAmount currencyID="JOD">150.00</cbc:LineExtensionAmount>')
-        ->toContain('<cbc:TaxAmount currencyID="JOD">0.00</cbc:TaxAmount>')
-        ->toContain('<cbc:RoundingAmount currencyID="JOD">150.00</cbc:RoundingAmount>')
+        ->toContain('<cbc:LineExtensionAmount currencyID="JOD">150.000</cbc:LineExtensionAmount>')
+        ->toContain('<cbc:TaxAmount currencyID="JOD">0.000</cbc:TaxAmount>')
+        ->toContain('<cbc:RoundingAmount currencyID="JOD">150.000</cbc:RoundingAmount>')
         ->toContain('<cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5305">Z</cbc:ID>')
-        ->toContain('<cbc:Percent>0.00</cbc:Percent>')
-        ->toContain('<cbc:Amount currencyID="JOD">50.00</cbc:Amount>'); // Discount amount
+        ->toContain('<cbc:Percent>0.000</cbc:Percent>')
+        ->toContain('<cbc:Amount currencyID="JOD">50.000</cbc:Amount>'); // Discount amount
 });
 
 test('it generates XML for tax exempted item without discount', function () {
@@ -297,12 +297,12 @@ test('it generates XML for tax exempted item without discount', function () {
     // Tax amount = 0 (exempted)
     // Tax inclusive = 200
     expect($xml)
-        ->toContain('<cbc:LineExtensionAmount currencyID="JOD">200.00</cbc:LineExtensionAmount>')
-        ->toContain('<cbc:TaxAmount currencyID="JOD">0.00</cbc:TaxAmount>')
-        ->toContain('<cbc:RoundingAmount currencyID="JOD">200.00</cbc:RoundingAmount>')
+        ->toContain('<cbc:LineExtensionAmount currencyID="JOD">200.000</cbc:LineExtensionAmount>')
+        ->toContain('<cbc:TaxAmount currencyID="JOD">0.000</cbc:TaxAmount>')
+        ->toContain('<cbc:RoundingAmount currencyID="JOD">200.000</cbc:RoundingAmount>')
         ->toContain('<cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5305">Z</cbc:ID>')
-        ->toContain('<cbc:Percent>0.00</cbc:Percent>')
-        ->toContain('<cbc:Amount currencyID="JOD">0.00</cbc:Amount>'); // Zero discount
+        ->toContain('<cbc:Percent>0.000</cbc:Percent>')
+        ->toContain('<cbc:Amount currencyID="JOD">0.000</cbc:Amount>'); // Zero discount
 });
 
 test('it generates XML for zero rated item with discount', function () {
@@ -320,12 +320,12 @@ test('it generates XML for zero rated item with discount', function () {
     // Tax amount = 0 (zero rated)
     // Tax inclusive = 150
     expect($xml)
-        ->toContain('<cbc:LineExtensionAmount currencyID="JOD">150.00</cbc:LineExtensionAmount>')
-        ->toContain('<cbc:TaxAmount currencyID="JOD">0.00</cbc:TaxAmount>')
-        ->toContain('<cbc:RoundingAmount currencyID="JOD">150.00</cbc:RoundingAmount>')
+        ->toContain('<cbc:LineExtensionAmount currencyID="JOD">150.000</cbc:LineExtensionAmount>')
+        ->toContain('<cbc:TaxAmount currencyID="JOD">0.000</cbc:TaxAmount>')
+        ->toContain('<cbc:RoundingAmount currencyID="JOD">150.000</cbc:RoundingAmount>')
         ->toContain('<cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5305">O</cbc:ID>')
-        ->toContain('<cbc:Percent>0.00</cbc:Percent>')
-        ->toContain('<cbc:Amount currencyID="JOD">50.00</cbc:Amount>'); // Discount amount
+        ->toContain('<cbc:Percent>0.000</cbc:Percent>')
+        ->toContain('<cbc:Amount currencyID="JOD">50.000</cbc:Amount>'); // Discount amount
 });
 
 test('it generates XML for zero rated item without discount', function () {
@@ -342,12 +342,12 @@ test('it generates XML for zero rated item without discount', function () {
     // Tax amount = 0 (zero rated)
     // Tax inclusive = 200
     expect($xml)
-        ->toContain('<cbc:LineExtensionAmount currencyID="JOD">200.00</cbc:LineExtensionAmount>')
-        ->toContain('<cbc:TaxAmount currencyID="JOD">0.00</cbc:TaxAmount>')
-        ->toContain('<cbc:RoundingAmount currencyID="JOD">200.00</cbc:RoundingAmount>')
+        ->toContain('<cbc:LineExtensionAmount currencyID="JOD">200.000</cbc:LineExtensionAmount>')
+        ->toContain('<cbc:TaxAmount currencyID="JOD">0.000</cbc:TaxAmount>')
+        ->toContain('<cbc:RoundingAmount currencyID="JOD">200.000</cbc:RoundingAmount>')
         ->toContain('<cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5305">O</cbc:ID>')
-        ->toContain('<cbc:Percent>0.00</cbc:Percent>')
-        ->toContain('<cbc:Amount currencyID="JOD">0.00</cbc:Amount>'); // Zero discount
+        ->toContain('<cbc:Percent>0.000</cbc:Percent>')
+        ->toContain('<cbc:Amount currencyID="JOD">0.000</cbc:Amount>'); // Zero discount
 });
 
 test('it handles multiple items with different tax and discount combinations', function () {
@@ -383,25 +383,25 @@ test('it handles multiple items with different tax and discount combinations', f
     // Tax amount = 150 * 0.16 = 24
     // Tax inclusive = 150 + 24 = 174
     expect($xml)
-        ->toContain('<cbc:LineExtensionAmount currencyID="JOD">150.00</cbc:LineExtensionAmount>')
-        ->toContain('<cbc:TaxAmount currencyID="JOD">24.00</cbc:TaxAmount>')
-        ->toContain('<cbc:RoundingAmount currencyID="JOD">174.00</cbc:RoundingAmount>');
+        ->toContain('<cbc:LineExtensionAmount currencyID="JOD">150.000</cbc:LineExtensionAmount>')
+        ->toContain('<cbc:TaxAmount currencyID="JOD">24.000</cbc:TaxAmount>')
+        ->toContain('<cbc:RoundingAmount currencyID="JOD">174.000</cbc:RoundingAmount>');
 
     // Second item
     // Tax exclusive = (3 * 50) - 25 = 125
     // Tax amount = 0 (exempted)
     // Tax inclusive = 125
     expect($xml)
-        ->toContain('<cbc:LineExtensionAmount currencyID="JOD">125.00</cbc:LineExtensionAmount>')
-        ->toContain('<cbc:TaxAmount currencyID="JOD">0.00</cbc:TaxAmount>')
-        ->toContain('<cbc:RoundingAmount currencyID="JOD">125.00</cbc:RoundingAmount>');
+        ->toContain('<cbc:LineExtensionAmount currencyID="JOD">125.000</cbc:LineExtensionAmount>')
+        ->toContain('<cbc:TaxAmount currencyID="JOD">0.000</cbc:TaxAmount>')
+        ->toContain('<cbc:RoundingAmount currencyID="JOD">125.000</cbc:RoundingAmount>');
 
     // Third item
     // Tax exclusive = 1 * 200 = 200
     // Tax amount = 0 (zero rated)
     // Tax inclusive = 200
     expect($xml)
-        ->toContain('<cbc:LineExtensionAmount currencyID="JOD">200.00</cbc:LineExtensionAmount>')
-        ->toContain('<cbc:TaxAmount currencyID="JOD">0.00</cbc:TaxAmount>')
-        ->toContain('<cbc:RoundingAmount currencyID="JOD">200.00</cbc:RoundingAmount>');
+        ->toContain('<cbc:LineExtensionAmount currencyID="JOD">200.000</cbc:LineExtensionAmount>')
+        ->toContain('<cbc:TaxAmount currencyID="JOD">0.000</cbc:TaxAmount>')
+        ->toContain('<cbc:RoundingAmount currencyID="JOD">200.000</cbc:RoundingAmount>');
 });
