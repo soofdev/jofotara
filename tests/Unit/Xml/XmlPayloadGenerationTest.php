@@ -67,10 +67,10 @@ test('throws exception when seller information is invalid', function () {
     // Set invalid seller information
     $invoice->sellerInformation()
         ->setName('Seller Company')
-        ->setTin('123'); // Should be 8 digits
+        ->setTin('123'); // Should be more than 6 digits
 
     expect(fn () => $invoice->generateXml())
-        ->toThrow(InvalidArgumentException::class, 'Invalid TIN format. Must be 8 digits');
+        ->toThrow(InvalidArgumentException::class, 'Invalid TIN format. Must be more than 6 digits');
 });
 
 test('throws exception when customer information is invalid', function () {
@@ -308,25 +308,25 @@ test('generates valid XML for cash invoice with tax exempt item', function () {
     </cac:Party>
 </cac:SellerSupplierParty>
 <cac:TaxTotal>
-    <cbc:TaxAmount currencyID="JOD">0.00</cbc:TaxAmount>
+    <cbc:TaxAmount currencyID="JOD">0.000</cbc:TaxAmount>
 </cac:TaxTotal>
 <cac:LegalMonetaryTotal>
-    <cbc:TaxExclusiveAmount currencyID="JOD">20.00</cbc:TaxExclusiveAmount>
-    <cbc:TaxInclusiveAmount currencyID="JOD">20.00</cbc:TaxInclusiveAmount>
-    <cbc:PayableAmount currencyID="JOD">20.00</cbc:PayableAmount>
+    <cbc:TaxExclusiveAmount currencyID="JOD">20.000</cbc:TaxExclusiveAmount>
+    <cbc:TaxInclusiveAmount currencyID="JOD">20.000</cbc:TaxInclusiveAmount>
+    <cbc:PayableAmount currencyID="JOD">20.000</cbc:PayableAmount>
 </cac:LegalMonetaryTotal>
 <cac:InvoiceLine>
     <cbc:ID>1</cbc:ID>
-    <cbc:InvoicedQuantity unitCode="PCE">2.00</cbc:InvoicedQuantity>
-    <cbc:LineExtensionAmount currencyID="JOD">20.00</cbc:LineExtensionAmount>
+    <cbc:InvoicedQuantity unitCode="PCE">2.000</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="JOD">20.000</cbc:LineExtensionAmount>
     <cac:TaxTotal>
-        <cbc:TaxAmount currencyID="JOD">0.00</cbc:TaxAmount>
-        <cbc:RoundingAmount currencyID="JOD">20.00</cbc:RoundingAmount>
+        <cbc:TaxAmount currencyID="JOD">0.000</cbc:TaxAmount>
+        <cbc:RoundingAmount currencyID="JOD">20.000</cbc:RoundingAmount>
         <cac:TaxSubtotal>
-            <cbc:TaxAmount currencyID="JOD">0.00</cbc:TaxAmount>
+            <cbc:TaxAmount currencyID="JOD">0.000</cbc:TaxAmount>
             <cac:TaxCategory>
                 <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5305">Z</cbc:ID>
-                <cbc:Percent>0.00</cbc:Percent>
+                <cbc:Percent>0.000</cbc:Percent>
                 <cac:TaxScheme>
                     <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5153">VAT</cbc:ID>
                 </cac:TaxScheme>
@@ -337,11 +337,11 @@ test('generates valid XML for cash invoice with tax exempt item', function () {
         <cbc:Name>Test Item</cbc:Name>
     </cac:Item>
     <cac:Price>
-        <cbc:PriceAmount currencyID="JOD">10.00</cbc:PriceAmount>
+        <cbc:PriceAmount currencyID="JOD">10.000</cbc:PriceAmount>
         <cac:AllowanceCharge>
             <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
             <cbc:AllowanceChargeReason>DISCOUNT</cbc:AllowanceChargeReason>
-            <cbc:Amount currencyID="JOD">0.00</cbc:Amount>
+            <cbc:Amount currencyID="JOD">0.000</cbc:Amount>
         </cac:AllowanceCharge>
     </cac:Price>
 </cac:InvoiceLine>
@@ -480,14 +480,14 @@ test('it auto-calculates invoice totals correctly', function () {
 
     // Tax Total section
     expect($xml)->toContain('<cac:TaxTotal>')
-        ->and($xml)->toContain('<cbc:TaxAmount currencyID="JOD">16.00</cbc:TaxAmount>')
-        ->and($xml)->toContain('<cbc:LineExtensionAmount currencyID="JOD">100.00</cbc:LineExtensionAmount>')
-        ->and($xml)->toContain('<cbc:Percent>16.00</cbc:Percent>')
+        ->and($xml)->toContain('<cbc:TaxAmount currencyID="JOD">16.000</cbc:TaxAmount>')
+        ->and($xml)->toContain('<cbc:LineExtensionAmount currencyID="JOD">100.000</cbc:LineExtensionAmount>')
+        ->and($xml)->toContain('<cbc:Percent>16.000</cbc:Percent>')
         // Legal Monetary Total section
         ->and($xml)->toContain('<cac:LegalMonetaryTotal>')
-        ->and($xml)->toContain('<cbc:TaxExclusiveAmount currencyID="JOD">100.00</cbc:TaxExclusiveAmount>')
-        ->and($xml)->toContain('<cbc:TaxInclusiveAmount currencyID="JOD">116.00</cbc:TaxInclusiveAmount>')
-        ->and($xml)->toContain('<cbc:PayableAmount currencyID="JOD">116.00</cbc:PayableAmount>');
+        ->and($xml)->toContain('<cbc:TaxExclusiveAmount currencyID="JOD">100.000</cbc:TaxExclusiveAmount>')
+        ->and($xml)->toContain('<cbc:TaxInclusiveAmount currencyID="JOD">116.000</cbc:TaxInclusiveAmount>')
+        ->and($xml)->toContain('<cbc:PayableAmount currencyID="JOD">116.000</cbc:PayableAmount>');
 });
 
 test('it should include customer information section with empty values when setupAnonymousCustomer is called', function () {

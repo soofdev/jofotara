@@ -15,7 +15,7 @@ function setupCreditInvoice(): JoFotaraService
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
         ->setIssueDate('16-02-2025')
         ->setInvoiceType('general_sales')
-        ->asCreditInvoice('INV-001', 'original-uuid', 200.00)
+        ->asCreditInvoice('INV-001', 'original-uuid', 200.000)
         ->cash();
 
     return $invoice;
@@ -62,10 +62,10 @@ test('generates valid credit invoice XML', function () {
 
     // Add totals
     $invoice->invoiceTotals()
-        ->setTaxExclusiveAmount(100.00)
-        ->setTaxInclusiveAmount(116.00)
-        ->setTaxTotalAmount(16.00)
-        ->setPayableAmount(116.00);
+        ->setTaxExclusiveAmount(100.000)
+        ->setTaxInclusiveAmount(116.000)
+        ->setTaxTotalAmount(16.000)
+        ->setPayableAmount(116.000);
 
     $xml = $invoice->generateXml();
 

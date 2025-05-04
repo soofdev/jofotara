@@ -53,7 +53,7 @@ test('it supports credit invoice type', function () {
         ->setUuid('123e4567-e89b-12d3-a456-426614174000')
         ->setIssueDate('16-02-2025')
         ->setInvoiceType('general_sales')
-        ->asCreditInvoice('INV-001', 'original-uuid', 200.00)
+        ->asCreditInvoice('INV-001', 'original-uuid', 200.000)
         ->cash();
 
     expect($invoice->basicInformation()->isCreditInvoice())->toBeTrue();

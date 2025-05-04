@@ -53,16 +53,16 @@ test('it generates exact XML structure with discount', function () {
 <cac:AllowanceCharge>
     <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
     <cbc:AllowanceChargeReason>discount</cbc:AllowanceChargeReason>
-    <cbc:Amount currencyID="JOD">10.00</cbc:Amount>
+    <cbc:Amount currencyID="JOD">10.000</cbc:Amount>
 </cac:AllowanceCharge>
 <cac:TaxTotal>
-    <cbc:TaxAmount currencyID="JOD">10.00</cbc:TaxAmount>
+    <cbc:TaxAmount currencyID="JOD">10.000</cbc:TaxAmount>
 </cac:TaxTotal>
 <cac:LegalMonetaryTotal>
-    <cbc:TaxExclusiveAmount currencyID="JOD">100.00</cbc:TaxExclusiveAmount>
-    <cbc:TaxInclusiveAmount currencyID="JOD">110.00</cbc:TaxInclusiveAmount>
-    <cbc:AllowanceTotalAmount currencyID="JOD">10.00</cbc:AllowanceTotalAmount>
-    <cbc:PayableAmount currencyID="JOD">100.00</cbc:PayableAmount>
+    <cbc:TaxExclusiveAmount currencyID="JOD">100.000</cbc:TaxExclusiveAmount>
+    <cbc:TaxInclusiveAmount currencyID="JOD">110.000</cbc:TaxInclusiveAmount>
+    <cbc:AllowanceTotalAmount currencyID="JOD">10.000</cbc:AllowanceTotalAmount>
+    <cbc:PayableAmount currencyID="JOD">100.000</cbc:PayableAmount>
 </cac:LegalMonetaryTotal>
 XML);
 
@@ -78,12 +78,12 @@ test('it generates XML structure without discount', function () {
 
     $expected = $this->normalizeXml(<<<'XML'
 <cac:TaxTotal>
-    <cbc:TaxAmount currencyID="JOD">16.00</cbc:TaxAmount>
+    <cbc:TaxAmount currencyID="JOD">16.000</cbc:TaxAmount>
 </cac:TaxTotal>
 <cac:LegalMonetaryTotal>
-    <cbc:TaxExclusiveAmount currencyID="JOD">100.00</cbc:TaxExclusiveAmount>
-    <cbc:TaxInclusiveAmount currencyID="JOD">116.00</cbc:TaxInclusiveAmount>
-    <cbc:PayableAmount currencyID="JOD">116.00</cbc:PayableAmount>
+    <cbc:TaxExclusiveAmount currencyID="JOD">100.000</cbc:TaxExclusiveAmount>
+    <cbc:TaxInclusiveAmount currencyID="JOD">116.000</cbc:TaxInclusiveAmount>
+    <cbc:PayableAmount currencyID="JOD">116.000</cbc:PayableAmount>
 </cac:LegalMonetaryTotal>
 XML);
 

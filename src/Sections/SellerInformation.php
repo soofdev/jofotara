@@ -165,9 +165,9 @@ class SellerInformation implements ValidatableSection
             throw new InvalidArgumentException('Seller name is required');
         }
 
-        // Validate TIN format (assuming 8 digits for Jordan)
-        if (! preg_match('/^\d{8}$/', $this->tin)) {
-            throw new InvalidArgumentException('Invalid TIN format. Must be 8 digits');
+        // Validate TIN format more than 6 digits
+        if (! preg_match('/^\d{6,}$/', $this->tin)) {
+            throw new InvalidArgumentException('Invalid TIN format. Must be more than 6 digits');
         }
 
         // Validate name is not empty
