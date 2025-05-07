@@ -109,18 +109,18 @@ test('it allows setting tax, discount and payable amounts', function () {
     $totals = new InvoiceTotals;
     $totals->setTaxExclusiveAmount(100)
         ->setDiscountTotalAmount(20)
-        ->setTaxInclusiveAmount(116)
-        ->setTaxTotalAmount(16)
-        ->setPayableAmount(96);
+        ->setTaxInclusiveAmount(92.8)
+        ->setTaxTotalAmount(12.8)
+        ->setPayableAmount(92.8);
 
     $totals->validateSection();
 
     expect($totals->toArray())->toBe([
         'taxExclusiveAmount' => 100.0,
-        'taxInclusiveAmount' => 116.0,
+        'taxInclusiveAmount' => 92.8,
         'discountTotalAmount' => 20.0,
-        'taxTotalAmount' => 16.0,
-        'payableAmount' => 96.0,
+        'taxTotalAmount' => 12.8,
+        'payableAmount' => 92.8,
     ]);
 });
 
