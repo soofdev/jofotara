@@ -250,25 +250,25 @@ class InvoiceLineItem implements ValidatableSection
         $xml = [];
         $xml[] = '<cac:InvoiceLine>';
         $xml[] = sprintf('    <cbc:ID>%s</cbc:ID>', $this->escapeXml($this->id));
-        $xml[] = sprintf('    <cbc:InvoicedQuantity unitCode="%s">%.3f</cbc:InvoicedQuantity>',
+        $xml[] = sprintf('    <cbc:InvoicedQuantity unitCode="%s">%.9f</cbc:InvoicedQuantity>',
             $this->escapeXml($this->unitCode),
             $this->quantity
         );
-        $xml[] = sprintf('    <cbc:LineExtensionAmount currencyID="JOD">%.3f</cbc:LineExtensionAmount>',
+        $xml[] = sprintf('    <cbc:LineExtensionAmount currencyID="JOD">%.9f</cbc:LineExtensionAmount>',
             $taxExclusiveAmount
         );
 
         // Tax information
         $xml[] = '    <cac:TaxTotal>';
-        $xml[] = sprintf('        <cbc:TaxAmount currencyID="JOD">%.3f</cbc:TaxAmount>', $taxAmount);
-        $xml[] = sprintf('        <cbc:RoundingAmount currencyID="JOD">%.3f</cbc:RoundingAmount>', $taxInclusiveAmount);
+        $xml[] = sprintf('        <cbc:TaxAmount currencyID="JOD">%.9f</cbc:TaxAmount>', $taxAmount);
+        $xml[] = sprintf('        <cbc:RoundingAmount currencyID="JOD">%.9f</cbc:RoundingAmount>', $taxInclusiveAmount);
         $xml[] = '        <cac:TaxSubtotal>';
-        $xml[] = sprintf('            <cbc:TaxAmount currencyID="JOD">%.3f</cbc:TaxAmount>', $taxAmount);
+        $xml[] = sprintf('            <cbc:TaxAmount currencyID="JOD">%.9f</cbc:TaxAmount>', $taxAmount);
         $xml[] = '            <cac:TaxCategory>';
         $xml[] = sprintf('                <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5305">%s</cbc:ID>',
             $this->escapeXml($this->taxCategory)
         );
-        $xml[] = sprintf('                <cbc:Percent>%.3f</cbc:Percent>', $this->taxPercent);
+        $xml[] = sprintf('                <cbc:Percent>%.9f</cbc:Percent>', $this->taxPercent);
         $xml[] = '                <cac:TaxScheme>';
         $xml[] = '                    <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5153">VAT</cbc:ID>';
         $xml[] = '                </cac:TaxScheme>';
@@ -283,11 +283,11 @@ class InvoiceLineItem implements ValidatableSection
 
         // Price information
         $xml[] = '    <cac:Price>';
-        $xml[] = sprintf('        <cbc:PriceAmount currencyID="JOD">%.3f</cbc:PriceAmount>', $this->unitPrice);
+        $xml[] = sprintf('        <cbc:PriceAmount currencyID="JOD">%.9f</cbc:PriceAmount>', $this->unitPrice);
         $xml[] = '        <cac:AllowanceCharge>';
         $xml[] = '            <cbc:ChargeIndicator>false</cbc:ChargeIndicator>';
         $xml[] = '            <cbc:AllowanceChargeReason>DISCOUNT</cbc:AllowanceChargeReason>';
-        $xml[] = sprintf('            <cbc:Amount currencyID="JOD">%.3f</cbc:Amount>', $this->discount);
+        $xml[] = sprintf('            <cbc:Amount currencyID="JOD">%.9f</cbc:Amount>', $this->discount);
         $xml[] = '        </cac:AllowanceCharge>';
         $xml[] = '    </cac:Price>';
         $xml[] = '</cac:InvoiceLine>';

@@ -33,7 +33,7 @@ class InvoiceTotals implements ValidatableSection
             throw new InvalidArgumentException('Tax exclusive amount cannot be negative');
         }
 
-        $this->taxExclusiveAmount = round($amount, 3);
+        $this->taxExclusiveAmount = round($amount, 9);
 
         return $this;
     }
@@ -55,7 +55,7 @@ class InvoiceTotals implements ValidatableSection
             throw new InvalidArgumentException('Tax inclusive amount cannot be less than tax exclusive amount');
         }
 
-        $this->taxInclusiveAmount = round($amount, 3);
+        $this->taxInclusiveAmount = round($amount, 9);
 
         return $this;
     }
@@ -81,7 +81,7 @@ class InvoiceTotals implements ValidatableSection
             throw new InvalidArgumentException('Discount total amount cannot be greater than tax exclusive amount');
         }
 
-        $this->discountTotalAmount = round($amount, 3);
+        $this->discountTotalAmount = round($amount, 9);
 
         return $this;
     }
@@ -103,7 +103,7 @@ class InvoiceTotals implements ValidatableSection
             throw new InvalidArgumentException('Tax total amount would make tax inclusive amount invalid');
         }
 
-        $this->taxTotalAmount = round($taxAmount, 3);
+        $this->taxTotalAmount = round($taxAmount, 9);
 
         return $this;
     }
@@ -125,7 +125,7 @@ class InvoiceTotals implements ValidatableSection
             throw new InvalidArgumentException('Payable amount cannot be less than tax inclusive amount minus discounts');
         }
 
-        $this->payableAmount = round($amount, 3);
+        $this->payableAmount = round($amount, 9);
 
         return $this;
     }
@@ -154,29 +154,29 @@ class InvoiceTotals implements ValidatableSection
             $xml[] = '<cac:AllowanceCharge>';
             $xml[] = '    <cbc:ChargeIndicator>false</cbc:ChargeIndicator>';
             $xml[] = '    <cbc:AllowanceChargeReason>discount</cbc:AllowanceChargeReason>';
-            $xml[] = sprintf('    <cbc:Amount currencyID="JOD">%.3f</cbc:Amount>', $this->discountTotalAmount);
+            $xml[] = sprintf('    <cbc:Amount currencyID="JOD">%.9f</cbc:Amount>', $this->discountTotalAmount);
             $xml[] = '</cac:AllowanceCharge>';
         }
 
         // Tax total
         $xml[] = '<cac:TaxTotal>';
-        $xml[] = sprintf('    <cbc:TaxAmount currencyID="JOD">%.3f</cbc:TaxAmount>', $this->taxTotalAmount);
+        $xml[] = sprintf('    <cbc:TaxAmount currencyID="JOD">%.9f</cbc:TaxAmount>', $this->taxTotalAmount);
         $xml[] = '</cac:TaxTotal>';
 
         // Monetary totals
         $xml[] = '<cac:LegalMonetaryTotal>';
-        $xml[] = sprintf('    <cbc:TaxExclusiveAmount currencyID="JOD">%.3f</cbc:TaxExclusiveAmount>',
+        $xml[] = sprintf('    <cbc:TaxExclusiveAmount currencyID="JOD">%.9f</cbc:TaxExclusiveAmount>',
             $this->taxExclusiveAmount
         );
-        $xml[] = sprintf('    <cbc:TaxInclusiveAmount currencyID="JOD">%.3f</cbc:TaxInclusiveAmount>',
+        $xml[] = sprintf('    <cbc:TaxInclusiveAmount currencyID="JOD">%.9f</cbc:TaxInclusiveAmount>',
             $this->taxInclusiveAmount
         );
         if ($this->discountTotalAmount > 0) {
-            $xml[] = sprintf('    <cbc:AllowanceTotalAmount currencyID="JOD">%.3f</cbc:AllowanceTotalAmount>',
+            $xml[] = sprintf('    <cbc:AllowanceTotalAmount currencyID="JOD">%.9f</cbc:AllowanceTotalAmount>',
                 $this->discountTotalAmount
             );
         }
-        $xml[] = sprintf('    <cbc:PayableAmount currencyID="JOD">%.3f</cbc:PayableAmount>',
+        $xml[] = sprintf('    <cbc:PayableAmount currencyID="JOD">%.9f</cbc:PayableAmount>',
             $this->payableAmount
         );
         $xml[] = '</cac:LegalMonetaryTotal>';
