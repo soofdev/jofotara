@@ -254,16 +254,16 @@ class InvoiceLineItem implements ValidatableSection
             $this->escapeXml($this->unitCode),
             $this->quantity
         );
-        $xml[] = sprintf('    <cbc:LineExtensionAmount currencyID="JOD">%.9f</cbc:LineExtensionAmount>',
+        $xml[] = sprintf('    <cbc:LineExtensionAmount currencyID="JO">%.9f</cbc:LineExtensionAmount>',
             $taxExclusiveAmount
         );
 
         // Tax information
         $xml[] = '    <cac:TaxTotal>';
-        $xml[] = sprintf('        <cbc:TaxAmount currencyID="JOD">%.9f</cbc:TaxAmount>', $taxAmount);
-        $xml[] = sprintf('        <cbc:RoundingAmount currencyID="JOD">%.9f</cbc:RoundingAmount>', $taxInclusiveAmount);
+        $xml[] = sprintf('        <cbc:TaxAmount currencyID="JO">%.9f</cbc:TaxAmount>', $taxAmount);
+        $xml[] = sprintf('        <cbc:RoundingAmount currencyID="JO">%.9f</cbc:RoundingAmount>', $taxInclusiveAmount);
         $xml[] = '        <cac:TaxSubtotal>';
-        $xml[] = sprintf('            <cbc:TaxAmount currencyID="JOD">%.9f</cbc:TaxAmount>', $taxAmount);
+        $xml[] = sprintf('            <cbc:TaxAmount currencyID="JO">%.9f</cbc:TaxAmount>', $taxAmount);
         $xml[] = '            <cac:TaxCategory>';
         $xml[] = sprintf('                <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5305">%s</cbc:ID>',
             $this->escapeXml($this->taxCategory)
@@ -283,11 +283,11 @@ class InvoiceLineItem implements ValidatableSection
 
         // Price information
         $xml[] = '    <cac:Price>';
-        $xml[] = sprintf('        <cbc:PriceAmount currencyID="JOD">%.9f</cbc:PriceAmount>', $this->unitPrice);
+        $xml[] = sprintf('        <cbc:PriceAmount currencyID="JO">%.9f</cbc:PriceAmount>', $this->unitPrice);
         $xml[] = '        <cac:AllowanceCharge>';
         $xml[] = '            <cbc:ChargeIndicator>false</cbc:ChargeIndicator>';
         $xml[] = '            <cbc:AllowanceChargeReason>DISCOUNT</cbc:AllowanceChargeReason>';
-        $xml[] = sprintf('            <cbc:Amount currencyID="JOD">%.9f</cbc:Amount>', $this->discount);
+        $xml[] = sprintf('            <cbc:Amount currencyID="JO">%.9f</cbc:Amount>', $this->discount);
         $xml[] = '        </cac:AllowanceCharge>';
         $xml[] = '    </cac:Price>';
         $xml[] = '</cac:InvoiceLine>';

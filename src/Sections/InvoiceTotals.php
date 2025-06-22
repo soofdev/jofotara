@@ -154,29 +154,29 @@ class InvoiceTotals implements ValidatableSection
             $xml[] = '<cac:AllowanceCharge>';
             $xml[] = '    <cbc:ChargeIndicator>false</cbc:ChargeIndicator>';
             $xml[] = '    <cbc:AllowanceChargeReason>discount</cbc:AllowanceChargeReason>';
-            $xml[] = sprintf('    <cbc:Amount currencyID="JOD">%.9f</cbc:Amount>', $this->discountTotalAmount);
+            $xml[] = sprintf('    <cbc:Amount currencyID="JO">%.9f</cbc:Amount>', $this->discountTotalAmount);
             $xml[] = '</cac:AllowanceCharge>';
         }
 
         // Tax total
         $xml[] = '<cac:TaxTotal>';
-        $xml[] = sprintf('    <cbc:TaxAmount currencyID="JOD">%.9f</cbc:TaxAmount>', $this->taxTotalAmount);
+        $xml[] = sprintf('    <cbc:TaxAmount currencyID="JO">%.9f</cbc:TaxAmount>', $this->taxTotalAmount);
         $xml[] = '</cac:TaxTotal>';
 
         // Monetary totals
         $xml[] = '<cac:LegalMonetaryTotal>';
-        $xml[] = sprintf('    <cbc:TaxExclusiveAmount currencyID="JOD">%.9f</cbc:TaxExclusiveAmount>',
+        $xml[] = sprintf('    <cbc:TaxExclusiveAmount currencyID="JO">%.9f</cbc:TaxExclusiveAmount>',
             $this->taxExclusiveAmount
         );
-        $xml[] = sprintf('    <cbc:TaxInclusiveAmount currencyID="JOD">%.9f</cbc:TaxInclusiveAmount>',
+        $xml[] = sprintf('    <cbc:TaxInclusiveAmount currencyID="JO">%.9f</cbc:TaxInclusiveAmount>',
             $this->taxInclusiveAmount
         );
         if ($this->discountTotalAmount > 0) {
-            $xml[] = sprintf('    <cbc:AllowanceTotalAmount currencyID="JOD">%.9f</cbc:AllowanceTotalAmount>',
+            $xml[] = sprintf('    <cbc:AllowanceTotalAmount currencyID="JO">%.9f</cbc:AllowanceTotalAmount>',
                 $this->discountTotalAmount
             );
         }
-        $xml[] = sprintf('    <cbc:PayableAmount currencyID="JOD">%.9f</cbc:PayableAmount>',
+        $xml[] = sprintf('    <cbc:PayableAmount currencyID="JO">%.9f</cbc:PayableAmount>',
             $this->payableAmount
         );
         $xml[] = '</cac:LegalMonetaryTotal>';
