@@ -347,6 +347,43 @@ $invoice->invoiceTotals()
 
 > **Note**: When manually setting totals, they must match the calculated values from the items, or an exception will be thrown to ensure data integrity.
 
+### Custom Totals (Disabling Validation)
+
+If you need to use totals that differ from the calculated values (e.g., due to external business logic, special rounding rules, or integration with other systems), you can disable totals validation:
+
+```php
+// Disable totals validation to allow custom values
+$invoice->disableTotalsValidation();
+
+// Set custom totals that may differ from calculated values
+$invoice->invoiceTotals()
+    ->setTaxExclusiveAmount(230.0)    // Custom amount
+    ->setTaxInclusiveAmount(260.0)    // Custom amount
+    ->setTaxTotalAmount(30.0)         // Custom amount
+    ->setPayableAmount(260.0);        // Custom amount
+
+// Generate XML with custom totals
+$xml = $invoice->generateXml();
+
+// Re-enable validation if needed
+$invoice->enableTotalsValidation();
+```
+
+Alternative methods for controlling validation:
+
+```php
+// Using setTotalsValidation method
+$invoice->setTotalsValidation(false);  // Disable
+$invoice->setTotalsValidation(true);   // Enable
+
+// Method chaining is supported
+$invoice->disableTotalsValidation()
+        ->invoiceTotals()
+        ->setTaxExclusiveAmount(100.0);
+```
+
+> **Important**: Disabling validation only affects the cross-validation between totals and line items. Individual field validation (e.g., negative amounts) still applies.
+
 ## API Communication
 
 The `send()` method handles the complete flow:

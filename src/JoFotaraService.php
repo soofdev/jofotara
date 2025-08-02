@@ -35,6 +35,11 @@ class JoFotaraService
 
     private string $clientSecret;
 
+    /**
+     * Whether to validate that invoice totals match calculated values from line items
+     */
+    private bool $validateTotals = true;
+
     public function __construct(string $clientId, string $clientSecret)
     {
         if (empty($clientId) || empty($clientSecret)) {
@@ -204,7 +209,7 @@ class JoFotaraService
         $this->invoiceTotals->validateSection();
 
         // Cross-section validation (totals matching items)
-        if ($this->items && $this->invoiceTotals) {
+        if ($this->items && $this->invoiceTotals && $this->validateTotals) {
             $items = $this->items->getItems();
             if (count($items) > 0) {
                 $calculatedTotals = new InvoiceTotals;
@@ -373,5 +378,39 @@ class JoFotaraService
 
         // Create a response object that can handle success, error, and auth failure responses
         return new JoFotaraResponse($result, $statusCode);
+    }
+
+    /**
+     * Disable totals validation to allow using manually set totals without
+     * cross-validation against calculated values from line items.
+     * 
+     * This is useful when you need to set exact totals that may differ
+     * from calculated values due to external business logic or rounding.
+     */
+    public function disableTotalsValidation(): self
+    {
+        $this->validateTotals = false;
+        return $this;
+    }
+
+    /**
+     * Enable totals validation (default behavior).
+     * 
+     * When enabled, manually set totals must match calculated values
+     * from line items or an exception will be thrown.
+     */
+    public function enableTotalsValidation(): self
+    {
+        $this->validateTotals = true;
+        return $this;
+    }
+
+    /**
+     * Set whether to validate totals against calculated values.
+     */
+    public function setTotalsValidation(bool $validate): self
+    {
+        $this->validateTotals = $validate;
+        return $this;
     }
 }
